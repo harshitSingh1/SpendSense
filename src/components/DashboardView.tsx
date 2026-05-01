@@ -1,0 +1,262 @@
+import React, { useState, useEffect } from "react";
+import { 
+  AlertCircle, 
+  Zap, 
+  ArrowUpRight, 
+  Chrome, 
+  ShieldCheck, 
+  TrendingDown, 
+  Clock,
+  Loader2,
+  TrendingUp,
+  Wallet
+} from "lucide-react";
+import { motion } from "motion/react";
+import { useCurrency, formatMoney } from "@/lib/utils/currency";
+
+import { StatCard, AlertItem } from "./dashboard/StatCard"; // I'll move these out if needed, but for now just cleanup
+import SpendingDonutChart from "./dashboard/SpendingDonutChart";
+import CashflowTrendChart from "./dashboard/CashflowTrendChart";
+import RecentActivityWidget from "./dashboard/RecentActivityWidget";
+import { FinancialCalendar } from "./dashboard/FinancialCalendar";
+import { getDashboardMetrics } from "../services/dashboardService";
+
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+export default function DashboardView() {
+  const currency = useCurrency();
+  const [session, setSession] = useState<any>(null);
+  const [metrics, setMetrics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<'monthly' | 'yearly' | 'all'>('yearly');
+
+  useEffect(() => {
+    const init = async () => {
+      setLoading(true);
+      try {
+        // Fetch session
+        const sessionRes = await fetch("/api/auth/session", { credentials: "include" });
+        if (sessionRes.ok) {
+          const sessionData = await sessionRes.json();
+          setSession(sessionData);
+        }
+
+        // Fetch metrics
+        const metricsData = await getDashboardMetrics(timeRange);
+        setMetrics(metricsData);
+      } catch (error) {
+        console.error("Dashboard init failed:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
+  }, [timeRange]);
+
+  if (loading && !metrics) {
+    return (
+      <div className="flex h-[600px] flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary/30" />
+        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Scanning Intelligence...</p>
+      </div>
+    );
+  }
+
+  const userName = session?.user?.name?.split(' ')[0] || 'Member';
+  
+  // Use backend-calculated health metrics
+  const healthScore = metrics?.healthScore ?? 50;
+  const isHealthy = healthScore >= 70;
+  const healthStatus = healthScore >= 80 ? "Excellent" : healthScore >= 50 ? "Stable" : "Needs Review";
+
+  return (
+    <div className="space-y-10 pb-20 max-w-7xl mx-auto">
+      {/* Time Range Filter */}
+      <div className="flex justify-end mb-6">
+        <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-zinc-800/50 rounded-xl border border-slate-200 dark:border-zinc-800">
+          <button 
+            onClick={() => setTimeRange('monthly')}
+            className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${timeRange === 'monthly' ? 'bg-white dark:bg-zinc-700 text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+          >
+            Monthly
+          </button>
+          <button 
+            onClick={() => setTimeRange('yearly')}
+            className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${timeRange === 'yearly' ? 'bg-white dark:bg-zinc-700 text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+          >
+            Yearly
+          </button>
+          <button 
+            onClick={() => setTimeRange('all')}
+            className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${timeRange === 'all' ? 'bg-white dark:bg-zinc-700 text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+          >
+            All Time
+          </button>
+        </div>
+      </div>
+
+      {/* Top Row: Metrics (Metrics) */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <StatCard 
+          title="Total Income" 
+          amount={formatMoney(metrics?.totalIncome ?? 0, currency)} 
+          icon={<TrendingUp className="h-5 w-5" />} 
+          color="emerald"
+        />
+        <StatCard 
+          title="Total Expenses" 
+          amount={formatMoney(metrics?.totalExpenses ?? 0, currency)} 
+          icon={<TrendingDown className="h-5 w-5" />} 
+          color="destructive"
+        />
+        <StatCard 
+          title="Current Balance" 
+          amount={formatMoney(metrics?.currentBalance ?? 0, currency)} 
+          icon={<Wallet className="h-5 w-5" />} 
+          color="primary"
+        />
+      </div>
+
+      {/* Top Row: Financial Calendar & Recent Activity */}
+      <div className="flex flex-col xl:grid xl:grid-cols-12 gap-8">
+        <Card className="xl:col-span-8 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
+          <CardHeader className="pb-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
+            <CardTitle className="text-lg font-bold text-slate-800 dark:text-white">Financial Calendar</CardTitle>
+            <CardDescription className="text-xs font-semibold tracking-wide text-slate-500">Transaction Pulse & Memos</CardDescription>
+          </CardHeader>
+          <CardContent className="h-auto xl:min-h-[450px] px-6 py-6 flex flex-col bg-white dark:bg-zinc-900">
+            <div className="flex-1 min-h-0">
+              <FinancialCalendar 
+                dailyCashflow={metrics?.dailyCashflow || []} 
+                calendarNotes={metrics?.calendarNotes || {}} 
+                monthlyTransactions={metrics?.monthlyTransactions || []}
+                onSaveNote={async (date, content) => {
+                   await import('../services/dashboardService').then(m => m.saveCalendarNote(date, content));
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="xl:col-span-4 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden flex flex-col">
+          <CardHeader className="pb-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
+            <CardTitle className="text-lg font-bold text-slate-800 dark:text-white">Recent Pulse</CardTitle>
+            <CardDescription className="text-xs font-semibold tracking-wide text-slate-500">Latest Transactions</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 px-6 py-6 min-h-0">
+            <RecentActivityWidget transactions={metrics?.monthlyTransactions || []} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Middle Row: Visuals */}
+      <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8">
+        {/* Spending Allocation */}
+        <Card className="lg:col-span-12 xl:col-span-4 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
+          <CardHeader className="pb-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
+            <CardTitle className="text-lg font-bold text-slate-800 dark:text-white">Spending Allocation</CardTitle>
+            <CardDescription className="text-xs font-semibold tracking-wide text-slate-500">Monthly Categorization</CardDescription>
+          </CardHeader>
+          <CardContent className="h-72 lg:h-96 px-6 py-6 flex flex-col items-center justify-center">
+            <SpendingDonutChart data={metrics?.categoryAllocation || []} />
+          </CardContent>
+        </Card>
+
+        {/* Cashflow Trends */}
+        <Card className="lg:col-span-12 xl:col-span-8 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
+          <CardHeader className="pb-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
+            <CardTitle className="text-lg font-bold text-slate-800 dark:text-white">Cashflow Trends</CardTitle>
+            <CardDescription className="text-xs font-semibold tracking-wide text-slate-500">Income vs Expenses Over Time</CardDescription>
+          </CardHeader>
+          <CardContent className="h-72 lg:h-96 px-6 py-6">
+            <CashflowTrendChart data={metrics?.dailyCashflow || []} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Bottom Row: AI Insights (Smart Intelligence) */}
+      <div className="grid gap-8 lg:grid-cols-12 items-stretch">
+        {/* Financial Health Score */}
+        <Card className="lg:col-span-5 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 flex flex-col items-center justify-center py-10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Zap className="h-20 w-20 text-emerald-500" />
+          </div>
+          
+          <div className="relative flex items-center justify-center mb-6">
+            <svg className="h-40 w-40 transform -rotate-90">
+              <circle
+                cx="80"
+                cy="80"
+                r="70"
+                stroke="currentColor"
+                strokeWidth="10"
+                fill="transparent"
+                className="text-slate-100 dark:text-zinc-800"
+              />
+              <motion.circle
+                cx="80"
+                cy="80"
+                r="70"
+                stroke="currentColor"
+                strokeWidth="10"
+                fill="transparent"
+                strokeDasharray="439.8"
+                initial={{ strokeDashoffset: 439.8 }}
+                animate={{ strokeDashoffset: 439.8 * (1 - healthScore/100) }}
+                transition={{ duration: 2, ease: "easeOut" }}
+                className={healthScore >= 80 ? "text-emerald-500" : healthScore >= 50 ? "text-amber-500" : "text-red-500"}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="font-mono text-5xl font-black tracking-tighter text-slate-900 dark:text-white">{healthScore}</span>
+              <span className="text-[10px] uppercase font-black text-slate-500 opacity-60 -mt-1 tracking-[0.2em]">Pulse Scale</span>
+            </div>
+          </div>
+          
+          <div className="text-center px-10">
+            <h4 className="text-xl font-bold flex items-center justify-center gap-2 text-slate-800 dark:text-slate-100">
+              Health Status: <span className={healthScore >= 80 ? "text-emerald-600" : healthScore >= 50 ? "text-amber-600" : "text-red-500"}>{healthStatus}</span>
+            </h4>
+            <p className="text-sm text-slate-500 mt-3 font-medium leading-relaxed italic">
+              {healthScore >= 80 
+                ? "Excellent. Your income inflow safely covers your expenses." 
+                : healthScore >= 50 
+                ? "Stable. Your cash flow is positive but recommend optimizing discretionary spending."
+                : "Attention Needed. Your burn rate is currently high relative to your income inflow."}
+            </p>
+          </div>
+        </Card>
+
+        {/* Smart Alerts */}
+        <Card className="lg:col-span-7 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900">
+          <CardHeader className="pb-4 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 rounded-t-3xl">
+            <div className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-emerald-500 animate-pulse" />
+              <CardTitle className="text-lg font-bold text-slate-800 dark:text-white">Smart Intelligence</CardTitle>
+            </div>
+            <CardDescription className="text-xs font-semibold tracking-wide text-slate-500">AI-Driven Alerts</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 py-6 px-6">
+            {metrics?.smartAlerts && metrics.smartAlerts.length > 0 ? (
+              metrics.smartAlerts.map((alert: any) => (
+                <AlertItem 
+                  key={alert.id}
+                  color={alert.type === 'Warning' ? 'amber' : alert.type === 'Success' ? 'emerald' : 'emerald'}
+                  icon={alert.type === 'Warning' ? <Clock className="h-4 w-4" /> : alert.type === 'Success' ? <ShieldCheck className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                  title={alert.title}
+                  desc={alert.message}
+                />
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 opacity-40">
+                <ShieldCheck className="h-10 w-10 mb-2" />
+                <p className="text-xs font-bold uppercase tracking-widest">No anomalies detected</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

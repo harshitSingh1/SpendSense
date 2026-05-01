@@ -6,6 +6,7 @@ export interface IGoal extends Document {
   targetAmount: number;
   currentAmount: number;
   targetDate: Date;
+  icon: string;
   status: 'active' | 'completed';
   createdAt: Date;
   updatedAt: Date;
@@ -18,6 +19,7 @@ const GoalSchema: Schema = new Schema(
     targetAmount: { type: Number, required: true },
     currentAmount: { type: Number, default: 0 },
     targetDate: { type: Date, required: true },
+    icon: { type: String, default: 'PiggyBank' },
     status: { type: String, enum: ['active', 'completed'], default: 'active' },
   },
   { timestamps: true }

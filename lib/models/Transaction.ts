@@ -1,29 +1,49 @@
-import mongoose, { Schema, Document, Model, Types } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface ITransaction extends Document {
-  userId: Types.ObjectId;
-  type: 'income' | 'expense';
+  userId: mongoose.Types.ObjectId;
   amount: number;
+  type: 'income' | 'expense';
   category: string;
+  description?: string;
   date: Date;
-  description: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const TransactionSchema: Schema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    type: { type: String, enum: ['income', 'expense'], required: true },
-    amount: { type: Number, required: true },
-    category: { type: String, required: true },
-    date: { type: Date, required: true, default: Date.now },
-    description: { type: String },
+    userId: { 
+      type: Schema.Types.ObjectId, 
+      ref: 'User', 
+      required: true 
+    },
+    amount: { 
+      type: Number, 
+      required: true 
+    },
+    type: { 
+      type: String, 
+      enum: ['income', 'expense'], 
+      required: true 
+    },
+    category: { 
+      type: String, 
+      required: true 
+    },
+    description: { 
+      type: String 
+    },
+    date: { 
+      type: Date, 
+      required: true, 
+      default: Date.now 
+    },
   },
   { timestamps: true }
 );
 
-// Compound index on userId and date for fast querying of user's financial history
+// Compound index for fast dashboard queries (User-specific transactions sorted by date)
 TransactionSchema.index({ userId: 1, date: -1 });
 
 const Transaction: Model<ITransaction> = 
