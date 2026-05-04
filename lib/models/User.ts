@@ -6,6 +6,10 @@ export interface IUser extends Document {
   password?: string;
   image?: string;
   onboardingCompleted: boolean;
+  proExpiresAt?: Date;
+  isPro?: boolean;
+  plan?: string;
+  isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +21,10 @@ const UserSchema: Schema = new Schema(
     password: { type: String },
     image: { type: String },
     onboardingCompleted: { type: Boolean, default: false },
+    proExpiresAt: { type: Date },
+    isPro: { type: Boolean, default: false },
+    plan: { type: String, default: 'free' },
+    isAdmin: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -17,6 +17,20 @@ export async function createGoal(req: Request) {
   const user = await requireUser(req);
   await dbConnect();
 
+  // Fetch full user to check Pro status
+  const User = (await import('../models/User')).default;
+  const fullUser = await User.findById((user as any).id);
+  const isPro = fullUser?.isPro;
+
+  if (!isPro) {
+    const goalsCount = await Goal.countDocuments({ userId: (user as any).id });
+    if (goalsCount >= 2) {
+      const error: any = new Error('Free tier is limited to 2 Piggy Banks.');
+      error.code = 'limit_reached';
+      throw error;
+    }
+  }
+
   const { title, targetAmount, targetDate, icon } = req.body;
 
   if (!title || !targetAmount || !targetDate) {
@@ -40,8 +54,59 @@ export async function createGoal(req: Request) {
 }
 
 /**
- * Fetch all goals for the logged-in user.
+ * Update a financial goal.
  */
+export async function updateGoal(req: Request) {
+  const user = await requireUser(req);
+  await dbConnect();
+
+  const { id } = req.params;
+  const { title, targetAmount, targetDate, icon } = req.body;
+
+  if (!id) {
+    throw new Error('Goal ID is required.');
+  }
+
+  const updateFields: any = {};
+  if (title) updateFields.title = title;
+  if (targetAmount) updateFields.targetAmount = Number(targetAmount);
+  if (targetDate) updateFields.targetDate = new Date(targetDate);
+  if (icon) updateFields.icon = icon;
+
+  const goal = await Goal.findOneAndUpdate(
+    { _id: id, userId: (user as any).id },
+    { $set: updateFields },
+    { new: true }
+  );
+
+  if (!goal) {
+    throw new Error('Goal not found or unauthorized.');
+  }
+
+  return JSON.parse(JSON.stringify(goal));
+}
+
+/**
+ * Delete a financial goal.
+ */
+export async function deleteGoal(req: Request) {
+  const user = await requireUser(req);
+  await dbConnect();
+
+  const { id } = req.params;
+
+  if (!id) {
+    throw new Error('Goal ID is required.');
+  }
+
+  const goal = await Goal.findOneAndDelete({ _id: id, userId: (user as any).id });
+
+  if (!goal) {
+    throw new Error('Goal not found or unauthorized.');
+  }
+
+  return { success: true };
+}
 export async function getGoals(req: Request) {
   const user = await requireUser(req);
   await dbConnect();

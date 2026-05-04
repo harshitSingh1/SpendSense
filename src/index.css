@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Sonsie+One&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @import "tw-animate-css";
@@ -8,6 +8,7 @@
 
 @theme inline {
     --font-heading: "Playfair Display", serif;
+    --font-sonsie: "Sonsie One", cursive;
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
     
@@ -34,13 +35,13 @@
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
 
-    --animate-shine: shine 1.5s ease-out infinite;
-    @keyframes shine {
-      0% {
-        transform: translateX(-200%) skewX(-12deg);
+    --animate-shimmer: shimmer 3s ease-in-out infinite;
+    @keyframes shimmer {
+      0%, 100% {
+        transform: translateX(-150%) skewX(-15deg);
       }
-      100% {
-        transform: translateX(200%) skewX(-12deg);
+      50% {
+        transform: translateX(150%) skewX(-15deg);
       }
     }
 }

@@ -35,11 +35,15 @@ export default function DashboardView() {
     const init = async () => {
       setLoading(true);
       try {
-        // Fetch session
-        const sessionRes = await fetch("/api/auth/session", { credentials: "include" });
-        if (sessionRes.ok) {
-          const sessionData = await sessionRes.json();
-          setSession(sessionData);
+        // Fetch session safely
+        try {
+          const sessionRes = await fetch("/api/auth/session", { credentials: "include" });
+          if (sessionRes.ok) {
+            const sessionData = await sessionRes.json();
+            setSession(sessionData);
+          }
+        } catch (sessionErr) {
+          console.warn("Could not fetch session, proceeding to metrics fetch:", sessionErr);
         }
 
         // Fetch metrics
@@ -71,10 +75,10 @@ export default function DashboardView() {
   const healthStatus = healthScore >= 80 ? "Excellent" : healthScore >= 50 ? "Stable" : "Needs Review";
 
   return (
-    <div className="space-y-10 pb-20 max-w-7xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 md:space-y-10 pb-10 max-w-7xl mx-auto w-full overflow-hidden">
       {/* Time Range Filter */}
-      <div className="flex justify-end mb-6">
-        <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-zinc-800/50 rounded-xl border border-slate-200 dark:border-zinc-800">
+      <div className="flex justify-center sm:justify-end mb-4 sm:mb-6">
+        <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-zinc-800/50 rounded-xl border border-slate-200 dark:border-zinc-800 scale-90 sm:scale-100">
           <button 
             onClick={() => setTimeRange('monthly')}
             className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${timeRange === 'monthly' ? 'bg-white dark:bg-zinc-700 text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
@@ -97,36 +101,42 @@ export default function DashboardView() {
       </div>
 
       {/* Top Row: Metrics (Metrics) */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-        <StatCard 
-          title="Total Income" 
-          amount={formatMoney(metrics?.totalIncome ?? 0, currency)} 
-          icon={<TrendingUp className="h-5 w-5" />} 
-          color="emerald"
-        />
-        <StatCard 
-          title="Total Expenses" 
-          amount={formatMoney(metrics?.totalExpenses ?? 0, currency)} 
-          icon={<TrendingDown className="h-5 w-5" />} 
-          color="destructive"
-        />
-        <StatCard 
-          title="Current Balance" 
-          amount={formatMoney(metrics?.currentBalance ?? 0, currency)} 
-          icon={<Wallet className="h-5 w-5" />} 
-          color="primary"
-        />
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+        <div className="col-span-1">
+          <StatCard 
+            title="Income" 
+            amount={formatMoney(metrics?.totalIncome ?? 0, currency)} 
+            icon={<TrendingUp className="h-5 w-5" />} 
+            color="emerald"
+          />
+        </div>
+        <div className="col-span-1">
+          <StatCard 
+            title="Expenses" 
+            amount={formatMoney(metrics?.totalExpenses ?? 0, currency)} 
+            icon={<TrendingDown className="h-5 w-5" />} 
+            color="destructive"
+          />
+        </div>
+        <div className="col-span-2 lg:col-span-1">
+          <StatCard 
+            title="Balance" 
+            amount={formatMoney(metrics?.currentBalance ?? 0, currency)} 
+            icon={<Wallet className="h-5 w-5" />} 
+            color="primary"
+          />
+        </div>
       </div>
 
       {/* Top Row: Financial Calendar & Recent Activity */}
-      <div className="flex flex-col xl:grid xl:grid-cols-12 gap-8">
-        <Card className="xl:col-span-8 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
-          <CardHeader className="pb-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
-            <CardTitle className="text-lg font-bold text-slate-800 dark:text-white">Financial Calendar</CardTitle>
-            <CardDescription className="text-xs font-semibold tracking-wide text-slate-500">Transaction Pulse & Memos</CardDescription>
+      <div className="flex flex-col xl:grid xl:grid-cols-12 gap-6 sm:gap-8">
+        <Card className="xl:col-span-8 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-2xl sm:rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
+          <CardHeader className="p-4 sm:p-6 pb-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
+            <CardTitle className="text-base sm:text-lg font-bold text-slate-800 dark:text-white">Financial Calendar</CardTitle>
+            <CardDescription className="text-[10px] sm:text-xs font-semibold tracking-wide text-slate-500">Transaction Pulse & Memos</CardDescription>
           </CardHeader>
-          <CardContent className="h-auto xl:min-h-[450px] px-6 py-6 flex flex-col bg-white dark:bg-zinc-900">
-            <div className="flex-1 min-h-0">
+          <CardContent className="h-auto xl:min-h-[450px] p-4 sm:p-6 flex flex-col bg-white dark:bg-zinc-900 overflow-x-auto">
+            <div className="flex-1 min-w-[300px]">
               <FinancialCalendar 
                 dailyCashflow={metrics?.dailyCashflow || []} 
                 calendarNotes={metrics?.calendarNotes || {}} 
@@ -139,12 +149,12 @@ export default function DashboardView() {
           </CardContent>
         </Card>
 
-        <Card className="xl:col-span-4 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden flex flex-col">
-          <CardHeader className="pb-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
-            <CardTitle className="text-lg font-bold text-slate-800 dark:text-white">Recent Pulse</CardTitle>
-            <CardDescription className="text-xs font-semibold tracking-wide text-slate-500">Latest Transactions</CardDescription>
+        <Card className="xl:col-span-4 border border-slate-100 dark:border-zinc-800 shadow-sm rounded-2xl sm:rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden flex flex-col">
+          <CardHeader className="p-4 sm:p-6 pb-2 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
+            <CardTitle className="text-base sm:text-lg font-bold text-slate-800 dark:text-white">Recent Pulse</CardTitle>
+            <CardDescription className="text-[10px] sm:text-xs font-semibold tracking-wide text-slate-500">Latest Transactions</CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 px-6 py-6 min-h-0">
+          <CardContent className="flex-1 p-4 sm:p-6 min-h-0">
             <RecentActivityWidget transactions={metrics?.monthlyTransactions || []} />
           </CardContent>
         </Card>
@@ -183,7 +193,7 @@ export default function DashboardView() {
             <Zap className="h-20 w-20 text-emerald-500" />
           </div>
           
-          <div className="relative flex items-center justify-center mb-6">
+          <div className="relative flex items-center justify-center mb-6 scale-75 sm:scale-100 transition-transform">
             <svg className="h-40 w-40 transform -rotate-90">
               <circle
                 cx="80"
@@ -214,11 +224,11 @@ export default function DashboardView() {
             </div>
           </div>
           
-          <div className="text-center px-10">
-            <h4 className="text-xl font-bold flex items-center justify-center gap-2 text-slate-800 dark:text-slate-100">
+          <div className="text-center px-4 sm:px-10">
+            <h4 className="text-lg sm:text-xl font-bold flex items-center justify-center gap-2 text-slate-800 dark:text-slate-100">
               Health Status: <span className={healthScore >= 80 ? "text-emerald-600" : healthScore >= 50 ? "text-amber-600" : "text-red-500"}>{healthStatus}</span>
             </h4>
-            <p className="text-sm text-slate-500 mt-3 font-medium leading-relaxed italic">
+            <p className="text-xs sm:text-sm text-slate-500 mt-3 font-medium leading-relaxed italic">
               {healthScore >= 80 
                 ? "Excellent. Your income inflow safely covers your expenses." 
                 : healthScore >= 50 

@@ -1,6 +1,6 @@
 {
   "name": "SpendSense AI",
   "description": "Smart financial tracking and intelligence with a calm, minimal interface.",
-  "requestFramePermissions": ["microphone"],
+  "requestFramePermissions": [],
   "majorCapabilities": []
 }

@@ -19,6 +19,7 @@ export async function addTransaction(data: TransactionData) {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
@@ -33,11 +34,12 @@ export async function addTransaction(data: TransactionData) {
 }
 
 export async function getRecentTransactions() {
-  const response = await fetch("/api/transactions?limit=10", {
+  const response = await fetch("/api/transactions", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -52,6 +54,7 @@ export async function getRecentTransactions() {
 export async function deleteTransaction(id: string) {
   const response = await fetch(`/api/transactions/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -68,6 +71,7 @@ export async function updateTransaction(id: string, data: Partial<TransactionDat
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 

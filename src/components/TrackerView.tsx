@@ -138,28 +138,28 @@ export default function TrackerView() {
   };
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-12 gap-8 items-start">
+    <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-start">
       {/* Left Column: Input Area */}
-      <div className="lg:col-span-5 space-y-6">
-        <Card className="border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
-          <CardHeader className="pb-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center">
+      <div className="lg:col-span-12 xl:col-span-5 space-y-4 sm:space-y-6 w-full">
+        <Card className="border border-slate-100 dark:border-zinc-800 shadow-sm rounded-2xl sm:rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
+          <CardHeader className="p-4 sm:p-6 pb-4 sm:pb-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center shrink-0">
                 <Plus className="h-6 w-6" />
               </div>
-              <div>
-                <CardTitle className="text-xl font-bold text-slate-800 dark:text-white">Log Transaction</CardTitle>
-                <CardDescription className="text-slate-500 font-medium">Capture your financial pulse instantly</CardDescription>
+              <div className="text-center sm:text-left">
+                <CardTitle className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">Log Transaction</CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-slate-500 font-medium">Capture your financial pulse instantly</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="p-4 sm:p-6 sm:pt-8">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {/* Amount */}
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Value Amount</label>
+                <label className="text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Value Amount</label>
                 <div className="relative group">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold opacity-30 group-focus-within:opacity-100 transition-opacity">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg sm:text-xl font-bold opacity-30 group-focus-within:opacity-100 transition-opacity">
                     {formatMoney(0, currency).replace(/[0-9.,\s]/g, '')}
                   </span>
                   <Input 
@@ -170,19 +170,19 @@ export default function TrackerView() {
                     value={formData.amount || ""}
                     onChange={(e) => setFormData({...formData, amount: parseFloat(e.target.value) || 0})}
                     placeholder="0.00" 
-                    className="h-16 pl-10 text-2xl font-mono font-bold rounded-2xl bg-muted/30 border-none shadow-inner focus:bg-background transition-all hover:bg-muted/100"
+                    className="h-14 sm:h-16 pl-10 text-xl sm:text-2xl font-mono font-bold rounded-xl sm:rounded-2xl bg-muted/30 border-none shadow-inner focus:bg-background transition-all hover:bg-muted/100"
                   />
                 </div>
               </div>
 
               {/* Type Radio-like Toggle */}
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Flow Type</label>
-                <div className="flex p-1 gap-1 rounded-2xl bg-muted/40 border border-border/50">
+                <label className="text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Flow Type</label>
+                <div className="flex p-1 gap-1 rounded-xl sm:rounded-2xl bg-muted/40 border border-border/50">
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, type: 'expense'})}
-                    className={`flex-1 h-12 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex-1 h-10 sm:h-12 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
                       formData.type === 'expense' 
                       ? 'bg-card text-foreground shadow-sm' 
                       : 'text-muted-foreground hover:bg-muted/60'
@@ -193,7 +193,7 @@ export default function TrackerView() {
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, type: 'income'})}
-                    className={`flex-1 h-12 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex-1 h-10 sm:h-12 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
                       formData.type === 'income' 
                       ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
                       : 'text-muted-foreground hover:bg-muted/60'
@@ -205,13 +205,13 @@ export default function TrackerView() {
               </div>
 
               {/* Category & Description */}
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Category</label>
+                  <label className="text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Category</label>
                   <select 
                     value={formData.category}
                     onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full h-14 rounded-2xl bg-muted/30 border-none px-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
+                    className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-muted/30 border-none px-4 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
                   >
                     {categories.map((cat) => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -219,12 +219,12 @@ export default function TrackerView() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Description</label>
+                  <label className="text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Description</label>
                   <Input 
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     placeholder="E.g. Groceries"
-                    className="h-14 rounded-2xl bg-muted/30 border-none px-4 focus:bg-background"
+                    className="h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-muted/30 border-none px-4 text-xs sm:text-sm focus:bg-background"
                   />
                 </div>
               </div>
@@ -232,7 +232,7 @@ export default function TrackerView() {
               <Button 
                 type="submit" 
                 disabled={isSubmitting || formData.amount <= 0}
-                className={`w-full h-14 rounded-2xl text-base font-bold transition-all active:scale-[0.98] ${
+                className={`w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold transition-all active:scale-[0.98] ${
                   successMessage 
                   ? 'bg-emerald-500 hover:bg-emerald-600 text-white' 
                   : 'bg-primary text-primary-foreground shadow-xl shadow-primary/20'
@@ -250,10 +250,10 @@ export default function TrackerView() {
         </Card>
 
         {/* Info Card */}
-        <div className="p-6 rounded-3xl bg-accent/5 border border-accent/10">
+        <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-accent/5 border border-accent/10">
           <div className="flex gap-3">
             <AlertCircle className="h-5 w-5 text-accent shrink-0" />
-            <p className="text-xs leading-relaxed text-muted-foreground font-medium italic">
+            <p className="text-[10px] sm:text-xs leading-relaxed text-muted-foreground font-medium italic">
               AI Tip: Logging expenses in the moment increases financial awareness by <span className="text-accent font-bold">23%</span>. Your SpendSense intelligence is tracking categories automatically.
             </p>
           </div>
@@ -261,76 +261,76 @@ export default function TrackerView() {
       </div>
 
       {/* Right Column: Recent Transactions */}
-      <div className="lg:col-span-7 space-y-6">
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-3">
-            <History className="h-5 w-5 text-muted-foreground" />
-            <h3 className="text-xl font-bold tracking-tight">Recent Activity</h3>
+      <div className="lg:col-span-12 xl:col-span-7 space-y-4 sm:space-y-6 w-full">
+        <div className="flex items-center justify-between px-1 sm:px-2">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <History className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+            <h3 className="text-lg sm:text-xl font-bold tracking-tight">Recent Activity</h3>
           </div>
           {transactions.length > 0 && (
-            <span className="text-[10px] font-bold uppercase tracking-widest bg-muted px-3 py-1 rounded-full text-muted-foreground">
-              Last 10 Logs
+            <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest bg-muted px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-muted-foreground">
+              All Logs
             </span>
           )}
         </div>
 
-        <Card className="border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
+        <Card className="border border-slate-100 dark:border-zinc-800 shadow-sm rounded-2xl sm:rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden">
           <CardContent className="p-0">
             {isLoading ? (
-              <div className="py-32 flex flex-col items-center justify-center text-center">
-                <Loader2 className="h-10 w-10 animate-spin text-primary/30 mb-4" />
-                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest animate-pulse">Syncing Ledger...</p>
+              <div className="py-20 sm:py-32 flex flex-col items-center justify-center text-center">
+                <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 animate-spin text-primary/30 mb-4" />
+                <p className="text-[10px] sm:text-sm font-bold text-muted-foreground uppercase tracking-widest animate-pulse">Syncing Ledger...</p>
               </div>
             ) : transactions.length === 0 ? (
-              <div className="py-24 px-10 text-center">
-                <div className="h-20 w-20 rounded-full bg-muted/40 mx-auto flex items-center justify-center mb-6">
-                  <History className="h-10 w-10 text-muted-foreground/30" />
+              <div className="py-16 sm:py-24 px-6 sm:px-10 text-center">
+                <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-muted/40 mx-auto flex items-center justify-center mb-4 sm:mb-6">
+                  <History className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground/30" />
                 </div>
-                <h4 className="text-lg font-bold mb-2">No transactions yet</h4>
-                <p className="text-muted-foreground text-sm max-w-[280px] mx-auto">Start tracking your financial pulse using the logger on the left.</p>
+                <h4 className="text-base sm:text-lg font-bold mb-2 text-slate-800 dark:text-white">No transactions yet</h4>
+                <p className="text-muted-foreground text-xs sm:text-sm max-w-[280px] mx-auto">Start tracking your financial pulse using the logger on the left.</p>
               </div>
             ) : (
-              <div className="w-full overflow-x-auto">
-                <div className="divide-y divide-border/50 min-w-[500px]">
+              <div className="w-full overflow-y-auto" style={{ maxHeight: "calc(100vh - 400px)", minHeight: "300px" }}>
+                <div className="divide-y divide-border/50 w-full min-w-full">
                   {transactions.map((tx, idx) => (
                   <motion.div
                     key={tx._id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className="flex items-center justify-between px-6 py-3 hover:bg-muted/30 transition-colors group"
+                    className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted/30 transition-colors group"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shrink-0 ${
                         tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-muted/60 text-muted-foreground'
                       }`}>
-                        {tx.type === 'income' ? <ArrowDownRight className="h-6 w-6" /> : <ArrowUpRight className="h-6 w-6" />}
+                        {tx.type === 'income' ? <ArrowDownRight className="h-5 w-5 sm:h-6 sm:w-6" /> : <ArrowUpRight className="h-5 w-5 sm:h-6 sm:w-6" />}
                       </div>
-                      <div>
-                        <p className="font-bold text-sm leading-tight mb-1">{tx.category}</p>
-                        <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight opacity-60">
+                      <div className="min-w-0 overflow-hidden">
+                        <p className="font-bold text-xs sm:text-sm leading-tight mb-0.5 sm:mb-1 truncate">{tx.category}</p>
+                        <p className="text-[9px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-tight opacity-70 truncate">
                           {tx.description || 'Omni-Track Logged'} • {format(new Date(tx.date), 'dd/MM/yy')}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2 sm:gap-6 shrink-0 ml-2">
                       <div className="text-right">
-                        <p className={`text-lg font-mono font-black tracking-tighter ${
+                        <p className={`text-sm sm:text-lg font-mono font-black tracking-tighter ${
                           tx.type === 'income' ? 'text-emerald-500' : 'text-foreground'
                         }`}>
                           {tx.type === 'income' ? '+' : '-'}{formatMoney(tx.amount ?? 0, currency)}
                         </p>
-                        <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-40">Processed</p>
+                        <p className="text-[8px] sm:text-[9px] font-bold text-muted-foreground uppercase opacity-40">Processed</p>
                       </div>
                       <DropdownMenu>
-                        <DropdownMenuTrigger className="inline-flex shrink-0 items-center justify-center text-sm font-medium hover:bg-muted hover:text-foreground h-8 w-8 rounded-full opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none focus:bg-muted">
+                        <DropdownMenuTrigger className="inline-flex shrink-0 items-center justify-center text-sm font-medium hover:bg-muted hover:text-foreground h-7 w-7 sm:h-8 sm:w-8 rounded-full focus:outline-none focus:bg-muted">
                           {actionLoadingId === tx._id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                           ) : (
-                            <MoreVertical className="h-4 w-4" />
+                            <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
                           )}
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-32 rounded-2xl">
+                        <DropdownMenuContent align="end" className="w-32 rounded-xl">
                           <DropdownMenuItem onClick={() => openEditModal(tx)} className="cursor-pointer gap-2 mb-1">
                             <Pencil className="h-4 w-4" />
                             Edit

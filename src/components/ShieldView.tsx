@@ -20,9 +20,10 @@ import { Button } from "@/components/ui/button";
 import { getProtectionMetrics, ProtectionMetrics } from "../services/protectionService";
 import BlackSwanSimulator from "./BlackSwanSimulator";
 import AIPolicyAuditorTease from "./AIPolicyAuditorTease";
+import PolicyScanner from "./PolicyScanner";
 import { useCurrency, formatMoney } from "@/lib/utils/currency";
 
-export default function ShieldView() {
+export default function ShieldView({ user, setActiveTab }: { user?: any, setActiveTab?: any }) {
   const userRegion = useCurrency();
   const [metrics, setMetrics] = useState<ProtectionMetrics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,21 +73,21 @@ export default function ShieldView() {
 
 
   return (
-    <div className="space-y-10 pb-16 animate-in fade-in duration-1000">
+    <div className="space-y-6 sm:space-y-10 pb-16 animate-in fade-in duration-1000">
       {/* Risk Architecture Header */}
-      <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[2.5rem] bg-white dark:bg-zinc-900 overflow-hidden relative">
-        <CardContent className="p-6 md:p-10 relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 justify-between">
+      <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl sm:rounded-[2.5rem] bg-white dark:bg-zinc-900 overflow-hidden relative">
+        <CardContent className="p-6 sm:p-8 md:p-10 relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 justify-between">
           
-          <div className="flex-1 space-y-4 text-center md:text-left">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+          <div className="flex-1 space-y-3 sm:space-y-4 text-center md:text-left">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
               Financial Runway: {runwayDays} Days
             </h2>
-            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">
+            <p className="text-sm sm:text-lg text-slate-500 dark:text-slate-400 font-medium">
               If your income stopped today, this is exactly how long you survive.
             </p>
           </div>
 
-          <div className="w-48 h-48 sm:w-64 sm:h-64 shrink-0 relative flex flex-col items-center justify-center">
+          <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 shrink-0 relative flex flex-col items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <RadialBarChart 
                 cx="50%" 
@@ -107,8 +108,8 @@ export default function ShieldView() {
               </RadialBarChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-5xl font-black text-slate-900 dark:text-white">{resilienceScore}</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Resilience</span>
+              <span className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white">{resilienceScore}</span>
+              <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 md:mt-1">Resilience</span>
             </div>
           </div>
           
@@ -116,38 +117,38 @@ export default function ShieldView() {
       </Card>
 
       {/* Shields Grid */}
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2">
         {/* Shield 1 (Emergency Fund) */}
-        <Card className="border border-slate-100 dark:border-zinc-800 shadow-sm rounded-[2rem] bg-white dark:bg-zinc-900 overflow-hidden hover:shadow-md transition-all duration-500">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-14 w-14 rounded-2xl flex items-center justify-center transition-transform hover:scale-110 bg-emerald-500/10 text-emerald-600 shadow-lg shadow-emerald-500/10">
-                <Siren className="h-6 w-6" />
+        <Card className="border border-slate-100 dark:border-zinc-800 shadow-sm rounded-2xl sm:rounded-[2rem] bg-white dark:bg-zinc-900 overflow-hidden hover:shadow-md transition-all duration-500">
+          <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
+            <div className="flex items-center justify-between mb-2 sm:mb-4">
+              <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl flex items-center justify-center transition-transform hover:scale-110 bg-emerald-500/10 text-emerald-600 shadow-lg shadow-emerald-500/10 shrink-0">
+                <Siren className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <div className={`flex items-center gap-1.5 px-4 py-2 rounded-full border ${isFullyShielded ? 'bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.3)]'}`}>
+              <div className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border ${isFullyShielded ? 'bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.3)]'}`}>
                 {isFullyShielded ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 animate-pulse" />
+                  <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-600 animate-pulse" />
                 ) : (
-                  <AlertTriangle className="h-3.5 w-3.5 text-amber-600 animate-pulse" />
+                  <AlertTriangle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 animate-pulse" />
                 )}
-                <span className={`text-[10px] font-black uppercase tracking-widest ${isFullyShielded ? 'text-emerald-600' : 'text-amber-600'}`}>
-                  {isFullyShielded ? 'Fully Shielded' : 'Vulnerable'}
+                <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${isFullyShielded ? 'text-emerald-600' : 'text-amber-600'}`}>
+                  {isFullyShielded ? 'Shielded' : 'Vulnerable'}
                 </span>
               </div>
             </div>
-            <CardTitle className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Emergency Buffer</CardTitle>
+            <CardTitle className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">Emergency Buffer</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <p className="text-base font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+          <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+            <div className="space-y-2 sm:space-y-3">
+              <p className="text-sm sm:text-base font-bold font-mono tracking-tight text-slate-900 dark:text-white truncate">
                 Current: {formatMoney(currentBalance, userRegion)} <span className="opacity-40">/</span> Target: {formatMoney(targetEmergencyFund, userRegion)}
               </p>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
+              <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
                 (6 Months) living expenses liquidity.
               </p>
             </div>
             
-            <div className="h-3 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+            <div className="h-2.5 sm:h-3 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                <motion.div 
                  initial={{ width: 0 }}
                  animate={{ width: `${emergencyPercentage}%` }}
@@ -159,29 +160,29 @@ export default function ShieldView() {
         </Card>
 
         {/* Shield 2 (Medical Armor) */}
-        <Card className="border border-amber-500/30 dark:border-amber-500/20 shadow-md shadow-amber-500/5 rounded-[2rem] bg-amber-50/30 dark:bg-zinc-900 overflow-hidden transition-all duration-500 flex flex-col justify-between">
+        <Card className="border border-amber-500/30 dark:border-amber-500/20 shadow-md shadow-amber-500/5 rounded-2xl sm:rounded-[2rem] bg-amber-50/30 dark:bg-zinc-900 overflow-hidden transition-all duration-500 flex flex-col justify-between">
           <div>
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-14 w-14 rounded-2xl flex items-center justify-center transition-transform hover:scale-110 bg-amber-500/10 text-amber-600 shadow-lg shadow-amber-500/10 relative">
-                  <div className="absolute inset-0 bg-amber-500/20 animate-ping rounded-2xl" />
-                  <HeartPulse className="h-6 w-6 relative z-10" />
+            <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
+                <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl flex items-center justify-center transition-transform hover:scale-110 bg-amber-500/10 text-amber-600 shadow-lg shadow-amber-500/10 relative shrink-0">
+                  <div className="absolute inset-0 bg-amber-500/20 animate-ping rounded-xl sm:rounded-2xl" />
+                  <HeartPulse className="h-5 w-5 sm:h-6 sm:w-6 relative z-10" />
                 </div>
-                <div className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                  <AlertTriangle className="h-3.5 w-3.5 text-amber-600 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase text-amber-600 tracking-widest">Vulnerable</span>
+                <div className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-amber-500/10 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                  <AlertTriangle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 animate-pulse" />
+                  <span className="text-[8px] sm:text-[10px] font-black uppercase text-amber-600 tracking-widest">Vulnerable</span>
                 </div>
               </div>
-              <CardTitle className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Medical Armor</CardTitle>
-              <CardDescription className="text-sm font-medium text-amber-700/80 dark:text-amber-400 mt-2">
+              <CardTitle className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">Medical Armor</CardTitle>
+              <CardDescription className="text-xs sm:text-sm font-medium text-amber-700/80 dark:text-amber-400 mt-1 sm:mt-2">
                 0 Premium Payments Detected.
               </CardDescription>
             </CardHeader>
           </div>
-          <CardContent className="pt-2">
-            <a href="https://ditto.in" target="_blank" rel="noopener noreferrer" className="block w-full">
+          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-2">
+            <a href="https://joinditto.in/" target="_blank" rel="noopener noreferrer" className="block w-full">
               <Button 
-                className="w-full h-14 rounded-2xl font-bold text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20 transition-all font-sans"
+                className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20 transition-all font-sans"
               >
                 Patch Vulnerability
                 <ArrowUpRight className="h-4 w-4 ml-2" />
@@ -192,9 +193,18 @@ export default function ShieldView() {
       </div>
 
       {/* Black Swan Simulator */}
-      <BlackSwanSimulator currentBalance={currentBalance} dailyBurnRate={dailyBurnRate} userRegion={userRegion} />
+      <BlackSwanSimulator 
+        currentBalance={currentBalance} 
+        dailyBurnRate={dailyBurnRate} 
+        userRegion={userRegion} 
+        setActiveTab={setActiveTab}
+      />
 
-      <AIPolicyAuditorTease />
+      {user?.isPro ? (
+        <PolicyScanner />
+      ) : (
+        <AIPolicyAuditorTease />
+      )}
     </div>
   );
 }

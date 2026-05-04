@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Minus, Lock, CreditCard, Sparkles, Brain, Shield, Target } from "lucide-react";
+import { Check, Minus, Lock, Unlock, CreditCard, Sparkles, Brain, Shield, Target } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getPricing } from "../config/pricing";
 
-export default function ProUpgradeView() {
+export default function ProUpgradeView({ user }: { user?: any }) {
   const pricing = getPricing();
+
+  const isPro = Boolean(user?.isPro);
 
   const baseFeatures = [
     "Manual Omni-Tracker",
@@ -28,12 +30,10 @@ export default function ProUpgradeView() {
   ];
 
   // Trigger the checkout overlay
-  const handleCheckoutMonthly = () => {
-    console.log(`Triggering checkout for Monthly plan at ${pricing.symbol}${pricing.monthly}`);
-  };
-
-  const handleCheckoutYearly = () => {
-    console.log(`Triggering checkout for Yearly plan at ${pricing.symbol}${pricing.yearly}`);
+  const handleCheckout = (plan: 'monthly' | 'quarterly' | 'yearly') => {
+    if (isPro) return;
+    window.history.pushState({}, '', `/checkout?plan=${plan}`);
+    window.dispatchEvent(new CustomEvent('navigate-view', { detail: 'checkout' }));
   };
 
   // Compute old values for comparisons
@@ -43,7 +43,8 @@ export default function ProUpgradeView() {
   const totalOld = oldApp1 + oldApp2 + oldApp3;
   const totalSaved = (totalOld - pricing.monthly) * 12;
 
-  const effectivelyMonthly = (pricing.yearly / 12).toFixed(0);
+  const effectivelyMonthlyQuarterly = (pricing.quarterly / 3).toFixed(0);
+  const effectivelyMonthlyYearly = (pricing.yearly / 12).toFixed(0);
 
   return (
     <motion.div 
@@ -114,50 +115,14 @@ export default function ProUpgradeView() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.8, staggerChildren: 0.2 }}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-6xl relative z-10 mb-12"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-6xl relative z-10 mb-12 items-center"
       >
-        {/* Card 1: The Core */}
-        <Card className="rounded-[2.5rem] border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm h-full flex flex-col p-2">
-          <CardHeader className="pb-6 pt-8 px-6 text-center border-b border-transparent">
-            <CardTitle className="text-2xl font-bold mb-2 text-slate-800 dark:text-white">The Core</CardTitle>
-            <CardDescription className="text-sm font-medium opacity-80 min-h-[40px] text-slate-500">
-              Everything you need to build the habit.
-            </CardDescription>
-            <div className="mt-6 flex items-baseline justify-center gap-1">
-              <span className="text-5xl font-black tracking-tighter text-slate-900 dark:text-white">{pricing.symbol}0</span>
-              <span className="text-slate-500 font-semibold">/mo</span>
-            </div>
-          </CardHeader>
-          <CardContent className="flex-1 px-6">
-            <ul className="space-y-4">
-              {baseFeatures.map((feature, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="h-5 w-5 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="h-3 w-3 text-slate-700 dark:text-slate-300" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-          <CardFooter className="px-6 pb-8 pt-4">
-            <Button variant="outline" className="w-full rounded-2xl py-6 font-bold text-sm bg-transparent border-slate-200 dark:border-zinc-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-slate-500 dark:hover:text-slate-400" disabled>
-              Your Current Plan
-            </Button>
-          </CardFooter>
-        </Card>
-
-        {/* Card 2: Pro Monthly (The Decoy) */}
+        {/* Card 1: Pro Monthly */}
         <Card className="rounded-[2.5rem] border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-md h-full flex flex-col p-2 relative">
           <CardHeader className="pb-6 pt-8 px-6 text-center border-b border-transparent">
-            <div className="inline-flex items-center justify-center mb-4 min-h-[28px]">
-              <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full border border-emerald-500/20">
-                50% OFF
-              </span>
-            </div>
-            <CardTitle className="text-2xl font-bold mb-2 text-slate-800 dark:text-white">Pro Monthly</CardTitle>
+            <CardTitle className="text-2xl font-bold mb-2 text-slate-800 dark:text-white">Monthly</CardTitle>
             <CardDescription className="text-sm font-medium opacity-80 min-h-[40px] text-slate-500">
-              Month-to-month intelligence.
+              Month-to-month intelligence. No commitment.
             </CardDescription>
             <div className="mt-4 flex flex-col items-center justify-center">
               <span className="text-sm font-bold text-slate-400 dark:text-slate-500 line-through decoration-red-500/50 mb-1">{pricing.symbol}{pricing.strikethroughMonthly}</span>
@@ -173,42 +138,93 @@ export default function ProUpgradeView() {
             <ul className="space-y-4">
               {proFeatures.map((feature, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <div className="h-5 w-5 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="h-3 w-3 text-indigo-600 dark:text-indigo-400" />
+                  <div className="h-5 w-5 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="h-3 w-3 text-slate-700 dark:text-slate-300" />
                   </div>
-                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{feature}</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{feature}</span>
                 </li>
               ))}
             </ul>
           </CardContent>
           <CardFooter className="px-6 pb-8 pt-4">
             <Button 
-              onClick={handleCheckoutMonthly}
-              className="w-full rounded-2xl py-6 font-bold text-sm bg-indigo-600 text-white shadow-lg hover:shadow-indigo-600/25 hover:scale-[1.02] active:scale-[0.98] hover:bg-indigo-700 transition-all"
+              onClick={() => handleCheckout('monthly')}
+              disabled={isPro}
+              className={`w-full rounded-2xl py-6 font-bold text-sm shadow-lg transition-all ${
+                isPro 
+                  ? 'bg-slate-800/10 dark:bg-slate-800/40 text-slate-900 dark:text-slate-100 cursor-not-allowed border-none shadow-none flex items-center justify-center gap-2' 
+                  : 'bg-slate-800 text-white hover:shadow-slate-600/25 hover:scale-[1.02] active:scale-[0.98] hover:bg-slate-700'
+              }`}
             >
-              Choose Monthly
+              {isPro ? <><Unlock className="h-4 w-4" /> Already Unlocked Pro</> : 'Choose Monthly'}
             </Button>
           </CardFooter>
         </Card>
 
-        {/* Card 3: Pro Yearly (The Anchor) */}
-        <Card className="rounded-[2.5rem] border-indigo-500/50 dark:border-indigo-500/60 bg-white dark:bg-zinc-950 shadow-[0_0_50px_rgba(79,70,229,0.2)] relative h-full flex flex-col p-2 overflow-hidden ring-2 ring-indigo-500/30 scale-100 lg:scale-[1.03] transform origin-bottom z-10">
+        {/* Card 2: Pro Quarterly (Most Popular) */}
+        <Card className="rounded-[2.5rem] border-indigo-500/50 dark:border-indigo-500/60 bg-white dark:bg-zinc-950 shadow-[0_0_50px_rgba(79,70,229,0.2)] relative h-full flex flex-col p-2 overflow-hidden ring-2 ring-indigo-500/30 scale-100 lg:scale-[1.05] transform origin-center z-20">
           <div className="absolute top-0 inset-x-0 bg-indigo-600 dark:bg-indigo-500 text-white text-[11px] font-black uppercase tracking-widest text-center py-2 shadow-inner">
-            Best Value
+            Most Popular
           </div>
           {/* Decorative background glow */}
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-indigo-500/20 blur-[80px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-emerald-500/15 blur-[80px] rounded-full pointer-events-none" />
-
+          
           <CardHeader className="pb-6 pt-10 px-6 text-center relative z-10">
-            <div className="inline-flex items-center justify-center mb-4 min-h-[28px]">
-               <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                SAVE 75%
-              </span>
-            </div>
-            <CardTitle className="text-2xl font-bold mb-2">Pro Yearly</CardTitle>
+            <CardTitle className="text-2xl font-bold mb-2">Quarterly</CardTitle>
             <CardDescription className="text-sm font-medium opacity-80 min-h-[40px]">
-              Master your wealth for a full year.
+              90 days to transform your finances.
+            </CardDescription>
+            <div className="mt-4 flex flex-col items-center justify-center">
+              <span className="text-sm font-bold text-muted-foreground line-through decoration-red-500/50 mb-1">{pricing.symbol}{pricing.strikethroughQuarterly}</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-5xl font-black tracking-tighter text-foreground">
+                  {pricing.symbol}{pricing.quarterly}
+                </span>
+                <span className="text-muted-foreground font-semibold">/3mo</span>
+              </div>
+              <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-2">
+                Effectively just {pricing.symbol}{effectivelyMonthlyQuarterly} / mo
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-1 px-6 relative z-10">
+            <ul className="space-y-4">
+              {proFeatures.map((feature, i) => (
+                <li key={`q-${i}`} className="flex items-start gap-3">
+                  <div className="h-5 w-5 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="h-3 w-3 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <span className="text-sm font-bold text-foreground/90">{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+          <CardFooter className="px-6 pb-8 pt-4 relative z-10">
+            <Button 
+              onClick={() => handleCheckout('quarterly')}
+              disabled={isPro}
+              className={`w-full rounded-2xl py-6 font-bold text-sm transition-all border ${
+                isPro 
+                  ? 'bg-indigo-600/10 dark:bg-indigo-600/40 text-indigo-900 dark:text-indigo-100 cursor-not-allowed border-none shadow-none flex items-center justify-center gap-2' 
+                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-500/30 hover:scale-[1.02] active:scale-[0.98] hover:bg-indigo-700 border-indigo-400/20'
+              }`}
+            >
+              {isPro ? <><Unlock className="h-4 w-4" /> Already Unlocked Pro</> : 'Choose Quarterly'}
+            </Button>
+          </CardFooter>
+        </Card>
+
+        {/* Card 3: Pro Yearly (Best Value) */}
+        <Card className="rounded-[2.5rem] border-emerald-500/30 dark:border-emerald-500/30 bg-white dark:bg-zinc-900 shadow-md relative h-full flex flex-col p-2 z-10">
+          <div className="absolute top-0 right-0 p-4 pt-4 pr-6">
+            <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full border border-emerald-500/20">
+              Save Max
+            </span>
+          </div>
+          <CardHeader className="pb-6 pt-10 px-6 text-center relative z-10">
+            <CardTitle className="text-2xl font-bold mb-2">Yearly</CardTitle>
+            <CardDescription className="text-sm font-medium opacity-80 min-h-[40px]">
+              Set it and forget it for 365 days.
             </CardDescription>
             <div className="mt-4 flex flex-col items-center justify-center">
               <span className="text-sm font-bold text-muted-foreground line-through decoration-red-500/50 mb-1">{pricing.symbol}{pricing.strikethroughYearly}</span>
@@ -218,33 +234,51 @@ export default function ProUpgradeView() {
                 </span>
                 <span className="text-muted-foreground font-semibold">/yr</span>
               </div>
-              <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-2">
-                Effectively just {pricing.symbol}{effectivelyMonthly} / mo
+              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-2">
+                Effectively just {pricing.symbol}{effectivelyMonthlyYearly} / mo
               </p>
             </div>
           </CardHeader>
           <CardContent className="flex-1 px-6 relative z-10">
             <ul className="space-y-4">
               {proYearlyFeatures.map((feature, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="h-5 w-5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                <li key={`y-${i}`} className="flex items-start gap-3">
+                  <div className="h-5 w-5 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <span className="text-sm font-bold text-foreground/90">{feature}</span>
+                  <span className="text-sm font-medium text-foreground/90">{feature}</span>
                 </li>
               ))}
             </ul>
           </CardContent>
           <CardFooter className="px-6 pb-8 pt-4 relative z-10">
             <Button 
-              onClick={handleCheckoutYearly}
-              className="w-full rounded-2xl py-6 font-bold text-sm bg-emerald-500 text-white shadow-xl shadow-emerald-500/30 hover:scale-[1.02] active:scale-[0.98] hover:bg-emerald-600 transition-all border border-emerald-400"
+              onClick={() => handleCheckout('yearly')}
+              disabled={isPro}
+              className={`w-full rounded-2xl py-6 font-bold text-sm transition-all border ${
+                isPro 
+                  ? 'bg-emerald-500/10 dark:bg-emerald-500/40 text-emerald-900 dark:text-emerald-100 cursor-not-allowed border-none shadow-none flex items-center justify-center gap-2' 
+                  : 'bg-emerald-500 text-white shadow-lg hover:scale-[1.02] active:scale-[0.98] hover:bg-emerald-600 border-emerald-400'
+              }`}
             >
-              Claim 75% Discount
+              {isPro ? <><Unlock className="h-4 w-4" /> Already Unlocked Pro</> : 'Choose Yearly'}
             </Button>
           </CardFooter>
         </Card>
       </motion.div>
+
+      {/* Conditional Dashboard Link for Pro Users */}
+      {isPro && (
+        <div className="mt-4 mb-4 text-center relative z-10 w-full">
+          <button 
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'dashboard' }))}
+            className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors inline-block"
+          >
+            ← Return to your Pro Dashboard
+          </button>
+        </div>
+      )}
 
       {/* Feature ROI Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mt-16 relative z-10">
@@ -393,10 +427,15 @@ export default function ProUpgradeView() {
       {/* Final CTA */}
       <div className="mt-24 text-center relative z-10">
         <Button 
-          onClick={handleCheckoutYearly}
-          className="rounded-full px-12 py-8 text-lg font-black bg-indigo-600 text-white shadow-xl shadow-indigo-600/25 hover:scale-[1.02] active:scale-[0.98] hover:bg-indigo-700 transition-all border border-indigo-500/20"
+          onClick={() => handleCheckout('quarterly')}
+          disabled={isPro}
+          className={`rounded-full px-12 py-8 text-lg font-black transition-all border ${
+            isPro
+              ? 'bg-indigo-600/10 dark:bg-indigo-600/40 text-indigo-900 dark:text-indigo-100 cursor-not-allowed border-none shadow-none flex items-center justify-center gap-2'
+              : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/25 hover:scale-[1.02] active:scale-[0.98] hover:bg-indigo-700 border-indigo-500/20'
+          }`}
         >
-          Start Your Pro Journey
+          {isPro ? <><Unlock className="h-5 w-5" /> Already Unlocked Pro</> : 'Start Your Pro Journey'}
         </Button>
       </div>
 

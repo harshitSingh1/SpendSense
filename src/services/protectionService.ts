@@ -18,6 +18,7 @@ export async function getProtectionMetrics(): Promise<ProtectionMetrics> {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
   if (!response.ok) {

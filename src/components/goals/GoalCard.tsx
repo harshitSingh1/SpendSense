@@ -14,7 +14,9 @@ import {
   Gift,
   Plus,
   Loader2,
-  Calendar
+  Calendar,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -28,7 +30,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { fundGoal, GoalData } from "@/src/services/goalService";
+import { fundGoal, deleteGoal, updateGoal, GoalData } from "@/src/services/goalService";
 
 const iconMap: Record<string, React.ReactNode> = {
   PiggyBank: <PiggyBank className="h-5 w-5" />,
@@ -52,6 +54,16 @@ export default function GoalCard({ goal, onUpdate }: GoalCardProps) {
   const [isFunding, setIsFunding] = useState(false);
   const [fundAmount, setFundAmount] = useState("");
   const [open, setOpen] = useState(false);
+  
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: goal.title,
+    targetAmount: goal.targetAmount.toString(),
+    targetDate: goal.targetDate.substring(0, 10),
+  });
 
   const percentage = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100);
   const leftAmount = Math.max(goal.targetAmount - goal.currentAmount, 0);
@@ -73,6 +85,36 @@ export default function GoalCard({ goal, onUpdate }: GoalCardProps) {
     }
   };
 
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteGoal(goal._id!);
+      setDeleteOpen(false);
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      console.error("Failed to delete goal:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      await updateGoal(goal._id!, {
+        title: editForm.title,
+        targetAmount: parseFloat(editForm.targetAmount),
+        targetDate: new Date(editForm.targetDate).toISOString(),
+      });
+      setEditOpen(false);
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      console.error("Failed to update goal:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <Card className="border border-slate-100 dark:border-zinc-800 shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden group hover:shadow-md transition-all duration-300">
       <CardHeader className="pb-4">
@@ -91,9 +133,19 @@ export default function GoalCard({ goal, onUpdate }: GoalCardProps) {
               </div>
             </div>
           </div>
-          <div className="text-right">
-             <span className="text-sm font-mono font-black text-slate-800 dark:text-white">₹{goal.currentAmount.toLocaleString()}</span>
-             <p className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">of ₹{goal.targetAmount.toLocaleString()}</p>
+          <div className="flex flex-col items-end gap-2">
+            <div className="text-right">
+               <span className="text-sm font-mono font-black text-slate-800 dark:text-white">₹{goal.currentAmount.toLocaleString()}</span>
+               <p className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">of ₹{goal.targetAmount.toLocaleString()}</p>
+            </div>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+               <Button size="icon" variant="ghost" className="h-6 w-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" onClick={() => setEditOpen(true)}>
+                  <Pencil className="h-3 w-3" />
+               </Button>
+               <Button size="icon" variant="ghost" className="h-6 w-6 text-slate-400 hover:text-red-500" onClick={() => setDeleteOpen(true)} disabled={isDeleting}>
+                  {isDeleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+               </Button>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -121,12 +173,10 @@ export default function GoalCard({ goal, onUpdate }: GoalCardProps) {
           </div>
           
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger render={
-              <Button size="sm" className="rounded-xl px-4 bg-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+            <DialogTrigger render={<Button size="sm" className="rounded-xl px-4 bg-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                 <Plus className="h-4 w-4 mr-1" />
                 Fund Goal
-              </Button>
-            } />
+              </Button>} />
             <DialogContent className="rounded-[2.5rem] p-8 border-none bg-white/95 backdrop-blur-xl shadow-2xl sm:max-w-[400px]">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-black text-center mb-2">Fund {goal.title}</DialogTitle>
@@ -162,6 +212,85 @@ export default function GoalCard({ goal, onUpdate }: GoalCardProps) {
                 </Button>
               </DialogFooter>
             </DialogContent>
+          </Dialog>
+
+          {/* Edit Dialog */}
+          <Dialog open={editOpen} onOpenChange={setEditOpen}>
+            <DialogContent className="rounded-[2.5rem] p-8 border-none bg-white/95 backdrop-blur-xl shadow-2xl sm:max-w-[400px]">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black text-center mb-2">Edit Piggy Bank</DialogTitle>
+                <div className="text-center pb-4">
+                   <p className="text-sm text-muted-foreground">Update the parameters of your goal.</p>
+                </div>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Goal Name</label>
+                  <Input 
+                    value={editForm.title}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                    className="h-12 rounded-xl bg-muted/30 border-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Target Amount</label>
+                  <Input 
+                    type="number"
+                    value={editForm.targetAmount}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, targetAmount: e.target.value }))}
+                    className="h-12 rounded-xl bg-muted/30 border-none focus:ring-2 focus:ring-primary/20 font-mono"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Target Date</label>
+                  <Input 
+                    type="date"
+                    value={editForm.targetDate}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, targetDate: e.target.value }))}
+                    className="h-12 rounded-xl bg-muted/30 border-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+              <DialogFooter className="mt-6">
+                <Button 
+                  onClick={handleUpdate} 
+                  disabled={isUpdating || !editForm.title || !editForm.targetAmount || !editForm.targetDate}
+                  className="w-full h-14 rounded-2xl text-base font-bold shadow-xl shadow-primary/20"
+                >
+                  {isUpdating ? (
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  ) : (
+                    <Pencil className="h-5 w-5 mr-2" />
+                  )}
+                  Update Goal
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Delete Dialog */}
+          <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+             <DialogContent className="rounded-[2.5rem] p-8 border-none bg-white/95 backdrop-blur-xl shadow-2xl sm:max-w-[400px]">
+               <DialogHeader>
+                 <DialogTitle className="text-xl font-black text-center mb-1 text-slate-900 dark:text-white">Delete Piggy Bank</DialogTitle>
+               </DialogHeader>
+               <div className="text-center py-2">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Are you sure?</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">This action cannot be undone.</p>
+               </div>
+               <DialogFooter className="mt-4 flex flex-row gap-3">
+                 <Button variant="outline" onClick={() => setDeleteOpen(false)} className="flex-1 h-12 rounded-xl font-bold bg-transparent">Cancel</Button>
+                 <Button 
+                   onClick={handleDelete} 
+                   disabled={isDeleting}
+                   variant="destructive"
+                   className="flex-1 h-12 rounded-xl font-bold bg-red-500 hover:bg-red-600 focus:ring-red-500/20"
+                 >
+                   {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                   Delete
+                 </Button>
+               </DialogFooter>
+             </DialogContent>
           </Dialog>
         </div>
       </CardContent>

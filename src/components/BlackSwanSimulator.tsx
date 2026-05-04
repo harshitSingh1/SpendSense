@@ -13,9 +13,10 @@ interface BlackSwanSimulatorProps {
   currentBalance: number;
   dailyBurnRate: number;
   userRegion?: CountryCode;
+  setActiveTab?: (tab: string) => void;
 }
 
-export default function BlackSwanSimulator({ currentBalance, dailyBurnRate, userRegion = 'IN' }: BlackSwanSimulatorProps) {
+export default function BlackSwanSimulator({ currentBalance, dailyBurnRate, userRegion = 'IN', setActiveTab }: BlackSwanSimulatorProps) {
   const [activeDisaster, setActiveDisaster] = useState<DisasterType>(null);
   
   const regionBenchmarks = benchmarks[userRegion] || benchmarks['IN'];
@@ -51,7 +52,7 @@ export default function BlackSwanSimulator({ currentBalance, dailyBurnRate, user
       description: `-${formatMoney(regionBenchmarks.carTotaled, userRegion)} instant asset replacement cost.`,
       cta: 'Comprehensive motor insurance and a dedicated emergency fund neutralize this threat.',
       ctaBtn: 'Review Motor Policy',
-      ctaLink: 'https://acko.com/auto-insurance/',
+      ctaLink: 'https://www.acko.com/car-insurance/',
       external: true
     }
   ];
@@ -167,8 +168,12 @@ export default function BlackSwanSimulator({ currentBalance, dailyBurnRate, user
                   onClick={(e) => {
                     if (!activeConfig?.external) {
                       e.preventDefault();
-                      window.history.pushState({}, '', activeConfig?.ctaLink);
-                      window.dispatchEvent(new CustomEvent('navigate', { detail: 'goals' }));
+                      if (setActiveTab) {
+                        setActiveTab('goals');
+                      } else {
+                        window.history.pushState({}, '', activeConfig?.ctaLink);
+                        window.dispatchEvent(new CustomEvent('navigate', { detail: 'goals' }));
+                      }
                     }
                   }}
                   className="inline-flex items-center justify-center shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 px-6 shadow-lg shadow-indigo-600/20 transition-colors cursor-pointer"

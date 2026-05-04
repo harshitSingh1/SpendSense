@@ -57,7 +57,7 @@ export const ACADEMY_ARTICLES: Article[] = [
         <p class="text-sm italic">In the last 40 years, the global supply of fiat currency has expanded exponentially. Those who held only cash saw their purchasing power collapse, while asset holders saw their nominal wealth explode.</p>
       </div>
 
-      <p>At SpendSense, we help you monitor the "Real Yield" of your portfolio—ensuring you're actually getting richer, not just seeing larger numbers in your bank account.</p>
+      <p>At SpendSense, we help you monitor the "Real Yield" of your portfolio - ensuring you're actually getting richer, not just seeing larger numbers in your bank account.</p>
     `
   },
   {
@@ -109,7 +109,7 @@ export const ACADEMY_ARTICLES: Article[] = [
         <li><strong>Consistency:</strong> No human error or emotional trading involved.</li>
       </ul>
 
-      <blockquote>"The index fund is the most effective investment device ever created for the individual investor." — Warren Buffett</blockquote>
+      <blockquote>"The index fund is the most effective investment device ever created for the individual investor." - Warren Buffett</blockquote>
 
       <p>The goal is time <i>in</i> the market, not <i>timing</i> the market. Start your Pulse Accumulator today in the Wealth Hub using low-cost index funds.</p>
     `

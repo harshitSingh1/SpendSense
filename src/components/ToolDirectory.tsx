@@ -61,37 +61,57 @@ interface Tool {
 function ToolVoter({ toolId, initialUpvotes, initialVote, onSync }: { toolId: string, initialUpvotes: number, initialVote: 'up' | 'down' | null, onSync?: () => void }) {
   const [vote, setVote] = useState<'up' | 'down' | null>(initialVote);
   const [score, setScore] = useState(initialUpvotes);
-  const [showTooltip, setShowTooltip] = useState(true);
+  const [showTeaser, setShowTeaser] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowTooltip(false), 10000);
-    return () => clearTimeout(timer);
-  }, []);
+    if (vote !== null) {
+      setShowTeaser(false);
+      return;
+    }
+
+    // Initial appearance
+    const initialTimer = setTimeout(() => {
+      setShowTeaser(true);
+      setTimeout(() => setShowTeaser(false), 3000);
+    }, 2000);
+
+    const interval = setInterval(() => {
+      setShowTeaser(true);
+      setTimeout(() => setShowTeaser(false), 3000);
+    }, 15000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(initialTimer);
+    };
+  }, [vote]);
 
   const handleVote = async (type: 'up' | 'down') => {
     if (vote === type) return; // Prevent double voting
-
-    setShowTooltip(false);
 
     // Optimistic UI updates
     const scoreDiff = vote === null ? (type === 'up' ? 1 : -1) : (type === 'up' ? 2 : -2);
     setVote(type);
     setScore(score + scoreDiff);
 
-    if (type === 'up') {
+    if (vote === null) {
       toast.success('+10 Financial IQ', {
-        description: 'You voted up this arbitrage tool.',
+        description: `You earned points for reviewing "${toolId}".`,
         icon: '🧠'
       });
     }
 
     try {
-      await fetch('/api/arsenal/rate', {
+      const res = await fetch('/api/arsenal/rate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ toolId, voteType: type })
       });
+      
       if (onSync) onSync();
+      // Signal notification refresh
+      window.dispatchEvent(new CustomEvent('refresh-notifications'));
     } catch (err) {
       console.error('Failed to rate tool', err);
     }
@@ -100,16 +120,17 @@ function ToolVoter({ toolId, initialUpvotes, initialVote, onSync }: { toolId: st
   return (
     <div className="absolute top-8 right-8 flex items-center gap-4 z-10">
       <AnimatePresence>
-        {showTooltip && vote === null && (
+        {showTeaser && vote === null && (
           <motion.div
-            initial={{ opacity: 0, x: 10, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-            className="hidden md:flex relative items-center px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-bold rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] whitespace-nowrap"
+            initial={{ opacity: 0, x: 10, scale: 0.9, filter: "blur(4px)" }}
+            animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, x: 5, scale: 0.9, filter: "blur(4px)" }}
+            transition={{ type: "spring", damping: 12, stiffness: 200 }}
+            className="hidden md:flex relative items-center px-3.5 py-1.5 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-xl ring-1 ring-white/20 whitespace-nowrap"
           >
-            <Sparkles className="w-4 h-4 mr-2 text-indigo-200" />
-            Vote for +10 IQ!
-            <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-3 h-3 bg-indigo-600 rotate-45 rounded-sm" />
+            <Sparkles className="w-3 h-3 mr-2 text-indigo-300 animate-pulse" />
+            Get +10 on vote/downvote
+            <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-indigo-600 rotate-45" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -148,7 +169,7 @@ export default function ToolDirectory({ onToolRated }: { onToolRated?: () => voi
   useEffect(() => {
     const fetchTools = async () => {
       try {
-        const res = await fetch('/api/arsenal/tools');
+        const res = await fetch('/api/arsenal/tools', { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           const mappedTools = data.map((t: any) => ({
@@ -166,7 +187,7 @@ export default function ToolDirectory({ onToolRated }: { onToolRated?: () => voi
 
   const handleVoteSync = async () => {
     try {
-      const res = await fetch('/api/arsenal/tools');
+      const res = await fetch('/api/arsenal/tools', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         const mappedTools = data.map((t: any) => ({

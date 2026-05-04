@@ -5,24 +5,30 @@ export const pricingConfig = {
     currency: 'INR', 
     symbol: '₹', 
     monthly: 199, 
-    yearly: 1549, 
+    quarterly: 499,
+    yearly: 1799, 
     strikethroughMonthly: 399, 
+    strikethroughQuarterly: 1197,
     strikethroughYearly: 4788 
   },
   US: { 
     currency: 'USD', 
     symbol: '$', 
     monthly: 16.99, 
+    quarterly: 39.99,
     yearly: 129, 
     strikethroughMonthly: 29.99, 
+    strikethroughQuarterly: 89.97,
     strikethroughYearly: 359.88 
   },
   GLOBAL: { 
     currency: 'USD', 
     symbol: '$', 
     monthly: 12.99, 
+    quarterly: 29.99,
     yearly: 99, 
     strikethroughMonthly: 24.99, 
+    strikethroughQuarterly: 74.97,
     strikethroughYearly: 299.88 
   }
 };

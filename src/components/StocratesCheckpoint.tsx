@@ -63,6 +63,7 @@ export default function StocratesCheckpoint({ slug, onComplete, onNext }: { slug
         const res = await fetch('/api/academy/complete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ slug, score: finalScore })
         });
         const data = await res.json();
@@ -70,6 +71,8 @@ export default function StocratesCheckpoint({ slug, onComplete, onNext }: { slug
            setAddedPoints(data.addedPoints);
         }
         onComplete?.();
+        // Signal notification refresh
+        window.dispatchEvent(new CustomEvent('refresh-notifications'));
       } catch (error) {
         console.error("Failed to record checkpoint completion", error);
       }

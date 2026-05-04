@@ -76,7 +76,7 @@ export default function LearnView() {
 
   const fetchProgress = async () => {
     try {
-      const res = await fetch('/api/academy/progress');
+      const res = await fetch('/api/academy/progress', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setFinancialIq(data.financialIq);
@@ -291,7 +291,7 @@ export default function LearnView() {
                           >
                             <p className="text-xl font-medium text-slate-800 dark:text-slate-200 m-0">{section.text}</p>
                             {section.author && (
-                              <footer className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-4">— {section.author}</footer>
+                              <footer className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-4">- {section.author}</footer>
                             )}
                           </motion.blockquote>
                         );

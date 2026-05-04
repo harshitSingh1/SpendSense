@@ -199,30 +199,31 @@ export default function WealthSimulator({ defaultMonthlyInvestment = 20000, show
         </div>
         {/* Optional Data Table */}
         {showTable && (
-          <div id="projection-table-section" className="mt-8 animate-in fade-in slide-in-from-top-4 duration-500">
-            <div className="overflow-x-auto">
+          <div id="projection-table-section" className="mt-12 min-h-[400px] border border-slate-200 dark:border-zinc-800 rounded-3xl bg-slate-50 dark:bg-zinc-900 overflow-hidden relative shadow-inner animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="p-8 prose prose-slate dark:prose-invert prose-headings:font-black max-w-none h-full overflow-x-auto">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Yearly Projection Data</h3>
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="border-b border-border/50">
-                    <th className="py-3 px-4 text-left font-semibold text-muted-foreground">Year</th>
-                    <th className="py-3 px-4 text-right font-semibold text-muted-foreground">Principal</th>
-                    <th className="py-3 px-4 text-right font-semibold text-muted-foreground">Inflation-Adjusted Value</th>
-                    <th className="py-3 px-4 text-right font-semibold text-muted-foreground">Market Value (12% Return)</th>
+                  <tr className="border-b border-slate-200 dark:border-zinc-800">
+                    <th className="py-4 px-4 text-left font-bold uppercase tracking-widest text-slate-500 text-[10px]">Year</th>
+                    <th className="py-4 px-4 text-right font-bold uppercase tracking-widest text-slate-500 text-[10px]">Principal</th>
+                    <th className="py-4 px-4 text-right font-bold uppercase tracking-widest text-slate-500 text-[10px]">Inflation-Adjusted</th>
+                    <th className="py-4 px-4 text-right font-bold uppercase tracking-widest text-slate-500 text-[10px]">Market Value (12%)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.map((row, index) => (
-                    <tr key={index} className="border-b border-border/10 hover:bg-muted/10 transition-colors">
-                      <td className="py-3 px-4 font-mono text-slate-700 dark:text-slate-300">
-                        {row.year === 0 ? "Now" : row.year}
+                    <tr key={index} className="border-b border-slate-100 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800/30 transition-colors">
+                      <td className="py-4 px-4 font-mono font-bold text-slate-700 dark:text-slate-300">
+                        {row.year === 0 ? "Now" : `Year ${row.year}`}
                       </td>
-                      <td className="py-3 px-4 font-mono text-right text-slate-700 dark:text-slate-300">
+                      <td className="py-4 px-4 font-mono text-right text-slate-600 dark:text-slate-400">
                         {formatINR(row.rawCash)}
                       </td>
-                      <td className="py-3 px-4 font-mono text-right text-red-500/80">
+                      <td className="py-4 px-4 font-mono text-right text-red-500 font-bold">
                         {formatINR(row.rawCash - row.rawLoss)}
                       </td>
-                      <td className="py-3 px-4 font-mono text-right text-emerald-500/90 font-medium">
+                      <td className="py-4 px-4 font-mono text-right text-emerald-500 font-black">
                         {formatINR(row.MarketGrowth)}
                       </td>
                     </tr>

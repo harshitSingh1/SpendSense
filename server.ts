@@ -2,7 +2,9 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import dotenv from "dotenv";
-import OpenAI from "openai";
+dotenv.config({ override: true });
+
+import { GoogleGenAI } from "@google/genai";
 import { auth } from "./lib/auth";
 import { protectRoutes } from "./lib/middleware";
 import { requireUser } from "./lib/auth-utils";
@@ -10,19 +12,32 @@ import dbConnect from "./lib/mongodb";
 import Transaction from "./lib/models/Transaction";
 
 import { getDashboardMetrics } from "./lib/actions/dashboard.actions";
-import { createGoal, getGoals, fundGoal } from "./lib/actions/goal.actions";
+import { createGoal, getGoals, fundGoal, updateGoal, deleteGoal } from "./lib/actions/goal.actions";
 import { getProtectionMetrics } from "./lib/actions/protection.actions";
 import { saveCalendarNote } from "./lib/actions/calendar.actions";
 import { generateAndSendOTP, verifyOTP } from "./lib/actions/auth.actions";
 import { authenticateChatUser, chatRateLimiter } from "./src/middleware/chatRateLimiter";
 import { otpRateLimiter } from "./src/middleware/otpRateLimiter";
 
-dotenv.config();
+let aiClient: GoogleGenAI | null = null;
+function getAIClient() {
+  if (!aiClient) {
+    const rawKey = process.env.GEMINI_API_KEY || (process.env as any).VITE_GEMINI_API_KEY || (process.env as any).NEXT_PUBLIC_GEMINI_API_KEY;
+    
+    let apiKey = typeof rawKey === 'string' ? rawKey.trim().replace(/^["']|["']$/g, '') : undefined;
 
-const openai = new OpenAI({ 
-  baseURL: 'https://api.featherless.ai/v1', 
-  apiKey: process.env.FEATHERLESS_API_KEY || '' 
-});
+    // Strict validation: Must look like a real key
+    if (!apiKey || !apiKey.startsWith('AIza') || apiKey.length < 20) {
+      console.warn(`[AI] Invalid API Key detected: ${apiKey ? apiKey.substring(0, 4) + '...' : 'MISSING'}`);
+      // Don't cache the client if the key is invalid, so we can try again if env changes
+      return new GoogleGenAI({ apiKey: apiKey || '' });
+    }
+
+    console.log(`[AI] Initializing with key starting with: ${apiKey.substring(0, 4)} (len: ${apiKey.length})`);
+    aiClient = new GoogleGenAI({ apiKey });
+  }
+  return aiClient;
+}
 
 async function startServer() {
   const app = express();
@@ -129,7 +144,7 @@ async function startServer() {
       res.json({ success: true });
     } catch (error: any) {
       if (error.message?.includes("Maximum attempts reached")) {
-        return res.status(403).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
       }
       if (error.message?.includes("Invalid OTP")) {
         return res.status(401).json({ error: error.message });
@@ -148,11 +163,103 @@ async function startServer() {
     });
   });
 
+  // 3.1 CRON - Monthly Digest
+  app.post("/api/cron/monthly-digest", async (req, res) => {
+    try {
+      const authHeader = req.headers['authorization'];
+      const secret = process.env.CRON_SECRET;
+      
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        console.warn('⚠️ Unauthorized CRON attempt');
+        return res.status(401).json({ error: "Unauthorized. Secure CRON secret required." });
+      }
+
+      await dbConnect();
+      const User = (await import("./lib/models/User")).default;
+      const Goal = (await import("./lib/models/Goal")).default;
+      const { createNotification } = await import("./lib/actions/notification.actions");
+
+      const allUsers = await User.find({}, '_id email');
+      
+      // Aggregate savings for ALL users in one go
+      const savingsAggregation = await Goal.aggregate([
+        { $group: { _id: '$userId', totalSavings: { $sum: '$currentAmount' } } }
+      ]);
+      
+      const savingsMap = new Map(savingsAggregation.map(s => [s._id.toString(), s.totalSavings]));
+
+      let count = 0;
+      for (const user of allUsers) {
+        const userId = user._id.toString();
+        const totalSavings = savingsMap.get(userId) || 0;
+        
+        const message = `Your monthly financial debrief is ready. You have ₹${totalSavings.toLocaleString('en-IN')} protected in your Piggy Banks.`;
+        
+        await createNotification(userId, '📊 Monthly Digest', message, 'system');
+        count++;
+      }
+
+      console.log(`✅ Monthly Digest CRON completed. Users processed: ${count}`);
+      res.json({ status: 'ok', usersProcessed: count });
+    } catch (error) {
+      console.error('❌ Monthly Digest CRON Failed:', error);
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  // 4.5 Notifications API Routes
+  app.get("/api/notifications", async (req, res) => {
+    try {
+      console.log('📬 GET /api/notifications called');
+      const user = await requireUser(req);
+      await dbConnect();
+      const NotificationModel = (await import("./lib/models/Notification")).default;
+      
+      const userId = (user as any).id || (user as any)._id;
+      console.log('📬 Fetching notifications for user:', userId);
+      
+      const notifications = await NotificationModel.find({ userId })
+        .sort({ createdAt: -1 })
+        .limit(20);
+        
+      res.json(notifications);
+    } catch (error) {
+      console.error('❌ Notification GET Error:', error);
+      res.status(401).json({ error: (error as Error).message });
+    }
+  });
+
+  app.patch("/api/notifications", async (req, res) => {
+    try {
+      const user = await requireUser(req);
+      await dbConnect();
+      const NotificationModel = (await import("./lib/models/Notification")).default;
+      
+      const userId = (user as any).id || (user as any)._id;
+      const { notificationIds, markAll } = req.body;
+      
+      if (markAll) {
+        await NotificationModel.updateMany({ userId, isRead: false }, { isRead: true });
+      } else if (Array.isArray(notificationIds)) {
+        await NotificationModel.updateMany(
+          { _id: { $in: notificationIds }, userId }, 
+          { isRead: true }
+        );
+      } else {
+        return res.status(400).json({ error: "Invalid request parameters." });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(401).json({ error: (error as Error).message });
+    }
+  });
+
   // 4. Transaction API Routes
   app.get("/api/transactions", async (req, res) => {
     try {
       const user = await requireUser(req);
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 1000;
       
       await dbConnect();
       const transactions = await Transaction.find({ userId: (user as any).id })
@@ -274,8 +381,12 @@ async function startServer() {
     try {
       const goal = await createGoal(req);
       res.status(201).json(goal);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+    } catch (error: any) {
+      if (error.code === 'limit_reached') {
+        res.status(400).json({ error: 'limit_reached', message: error.message });
+      } else {
+        res.status(400).json({ error: error.message });
+      }
     }
   });
 
@@ -288,6 +399,24 @@ async function startServer() {
     }
   });
 
+  app.put("/api/goals/:id", async (req, res) => {
+    try {
+      const goal = await updateGoal(req);
+      res.json(goal);
+    } catch (error) {
+      res.status(400).json({ error: (error as Error).message });
+    }
+  });
+
+  app.delete("/api/goals/:id", async (req, res) => {
+    try {
+      const result = await deleteGoal(req);
+      res.json(result);
+    } catch (error) {
+      res.status(400).json({ error: (error as Error).message });
+    }
+  });
+
   // 4.2 Protection API Routes
   app.get("/api/protection/data", async (req, res) => {
     try {
@@ -295,6 +424,118 @@ async function startServer() {
       res.json(metrics);
     } catch (error) {
       res.status(401).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/protection/scan", async (req, res) => {
+    try {
+      const user = await requireUser(req);
+      await dbConnect();
+      const User = (await import("./lib/models/User")).default;
+      
+      const targetId = (user as any).id || (user as any)._id || (user as any).userId;
+      const dbUser = await User.findById(targetId);
+
+      const isUserPro = dbUser?.isPro || (dbUser?.proExpiresAt && new Date(dbUser.proExpiresAt) > new Date());
+      if (!isUserPro) {
+        return res.status(400).json({ error: "Policy Auditor is highly guarded and strictly reserved for SpendSense Pro members." });
+      }
+
+      const { policyText, policyType } = req.body;
+
+      if (!policyText || !policyType) {
+        return res.status(400).json({ error: "Missing required parameters." });
+      }
+
+      const prompt = `Act as a ruthless insurance auditor. Analyze this ${policyType} policy text. CRITICAL INSTRUCTIONS: Do not summarize the policy. Identify ONLY the top 3 to 5 most dangerous hidden clauses, sub-limits, or denied-claim loopholes. Format with Red Flags (Danger) and Green Flags (Good). Keep the explanation for each flag under two sentences. Be brutal and concise.
+
+Policy Text: ${policyText}`;
+
+      const response = await getAIClient().models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: prompt,
+      });
+
+      if (!response || !response.text) {
+        throw new Error("Empty response from AI model.");
+      }
+
+      res.json({ analysis: response.text });
+    } catch (error: any) {
+      console.error("❌ Policy Scan Error:", error);
+      const isApiKeyError = error.message?.includes("API key not valid") || 
+                           error.message?.includes("API_KEY_INVALID") ||
+                           JSON.stringify(error).includes("API_KEY_INVALID");
+      
+      if (isApiKeyError) {
+        return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
+      }
+      res.status(500).json({ error: error.message || String(error) || "Failed to scan policy." });
+    }
+  });
+
+  app.get("/api/user/status", async (req, res) => {
+    try {
+      const user = await requireUser(req);
+      await dbConnect();
+      const User = (await import("./lib/models/User")).default;
+      const targetId = (user as any).id || (user as any)._id || (user as any).userId;
+      const dbUser = await User.findById(targetId);
+      res.json({
+        isPro: dbUser?.isPro || false,
+        promptCountToday: 0 // Assume 0 if not tracked persistently yet
+      });
+    } catch (error) {
+      res.status(401).json({ error: "Unauthorized" });
+    }
+  });
+
+  app.post("/api/wealth/generate", async (req, res) => {
+    console.log('🚀 WEALTH ROUTE HIT by User:', (req as any).user?.id);
+    try {
+      const user = await requireUser(req);
+      await dbConnect();
+      const User = (await import("./lib/models/User")).default;
+      
+      const targetId = (user as any).id || (user as any)._id || (user as any).userId;
+      const dbUser = await User.findById(targetId);
+
+      console.log('🔑 DB Lookup for ID:', targetId); 
+      console.log('👤 DB User Found:', dbUser ? dbUser.isPro : 'USER IS NULL');
+
+      const isUserPro = dbUser?.isPro || (dbUser?.proExpiresAt && new Date(dbUser.proExpiresAt) > new Date());
+      if (!isUserPro) {
+        return res.status(400).json({ error: "Portfolio generation is highly guarded and strictly reserved for SpendSense Pro members." });
+      }
+
+      const { age, monthlyAmount, riskTolerance, primaryGoal } = req.body;
+
+      if (!age || !monthlyAmount || !riskTolerance || !primaryGoal) {
+        return res.status(400).json({ error: "Missing required parameters." });
+      }
+
+      const prompt = `Act as a fiduciary financial advisor. Based on Age ${age}, a monthly investment of ₹${monthlyAmount}, Risk Tolerance: ${riskTolerance}, and Primary Goal: ${primaryGoal}, output a recommended Boglehead-style ETF portfolio allocation. CRITICAL INSTRUCTIONS: Keep the entire response under 250 words. Do not write introductory or concluding paragraphs. Use a strict, highly scannable bullet-point format. Prioritize mathematical clarity over conversational fluff.`;
+
+      const result = await getAIClient().models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt
+      });
+
+      if (!result || !result.text) {
+        throw new Error("AI failed to generate a plan. Please try again.");
+      }
+
+      res.json({ recommendation: result.text });
+    } catch (error: any) {
+      console.error('❌ Wealth Genesis Error:', error);
+      const isApiKeyError = error.message?.includes("API key not valid") || 
+                           error.message?.includes("API_KEY_INVALID") ||
+                           JSON.stringify(error).includes("API_KEY_INVALID");
+
+      if (isApiKeyError) {
+        return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
+      }
+      res.status(500).json({ error: error.message || String(error) || "Genesis failed." });
     }
   });
 
@@ -330,18 +571,40 @@ async function startServer() {
         }))
       ];
 
-      // 5. Call Featherless API
-      const response = await openai.chat.completions.create({
-        model: "deepseek-ai/DeepSeek-V3.2",
-        messages: messages
-      });
+      // 5. Call Gemini API
+      let outputText = "";
+      try {
+        const geminiMessages = history.map((m: any) => ({
+          role: m.role === "ai" || m.role === "assistant" ? "model" : "user",
+          parts: [{ text: m.content || m.parts?.[0]?.text || "" }]
+        }));
+        
+        const response = await getAIClient().models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: geminiMessages,
+          config: { systemInstruction: systemMessage.content }
+        });
 
-      const aiMessage = response.choices[0]?.message?.content || "";
+        if (!response || !response.text) {
+          throw new Error("No response from AI assistant.");
+        }
 
-      res.json({ message: aiMessage, text: aiMessage });
+        outputText = response.text || "";
+      } catch (e: any) {
+        console.error("❌ Chat Gemini Error:", e);
+        const isApiKeyError = e.message?.includes("API key not valid") || 
+                             e.message?.includes("API_KEY_INVALID") ||
+                             JSON.stringify(e).includes("API_KEY_INVALID");
+                             
+        if (isApiKeyError) {
+          return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
+        }
+        return res.status(500).json({ error: e.message || String(e) || "Chat processing failed" });
+      }
+
+      res.json({ message: outputText, text: outputText });
     } catch (error: any) {
-      console.error("Featherless API Error:", error);
-      res.status(500).json({ error: "Failed to communicate with DeepSeek." });
+      res.status(500).json({ error: error.message || "Failed to communicate with AI." });
     }
   });
 
@@ -394,6 +657,161 @@ async function startServer() {
       const result = await getTools(req);
       res.json(result);
     } catch (error) {
+      res.status(400).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/admin/broadcast", async (req, res) => {
+    try {
+      const user = await requireUser(req);
+      const adminEmails = process.env.VITE_ADMIN_EMAILS?.split(',') || [];
+      if (!adminEmails.includes(user.email)) {
+        return res.status(403).json({ error: "Unauthorized. Admin access required." });
+      }
+
+      const { title, message, type = 'global' } = req.body;
+      if (!title || !message) {
+        return res.status(400).json({ error: "Title and message are required." });
+      }
+
+      const { broadcastNotification } = await import("./lib/actions/notification.actions");
+      const result = await broadcastNotification(title, message, type);
+      
+      if (result.success) {
+        res.json({ success: true, count: result.count });
+      } else {
+        res.status(500).json({ error: result.error });
+      }
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/checkout/redeem", async (req, res) => {
+    try {
+      const user = await requireUser(req);
+      await dbConnect();
+      
+      const { Coupon } = await import("./lib/models/Coupon");
+      const User = (await import("./lib/models/User")).default;
+      
+      const { code } = req.body;
+      if (!code) {
+        return res.status(400).json({ error: "Coupon code is required" });
+      }
+
+      const couponCode = code.trim().toUpperCase();
+      const coupon = await Coupon.findOne({ code: couponCode });
+      
+      if (!coupon) {
+        return res.status(404).json({ error: "Coupon not found" });
+      }
+
+      if (!coupon.isActive) {
+        return res.status(400).json({ error: "Coupon is deactivated" });
+      }
+
+      if (coupon.expiresAt && new Date() > coupon.expiresAt) {
+        return res.status(400).json({ error: "Coupon has expired" });
+      }
+
+      if (coupon.currentUses >= coupon.maxUses) {
+        return res.status(400).json({ error: "Coupon limit reached" });
+      }
+
+      // Atomic Update
+      const updatedCoupon = await Coupon.findOneAndUpdate(
+        { 
+          _id: coupon._id, 
+          currentUses: { $lt: coupon.maxUses }, 
+          isActive: true 
+        },
+        { 
+          $inc: { currentUses: 1 } 
+        },
+        { new: true }
+      );
+
+      if (!updatedCoupon) {
+        return res.status(400).json({ error: "Coupon limit reached" });
+      }
+
+      const durationMonths = updatedCoupon.durationMonths;
+      const newExpirationDate = new Date();
+      newExpirationDate.setMonth(newExpirationDate.getMonth() + durationMonths);
+
+      const planName = durationMonths === 12 ? '1 Year' : `${durationMonths} Month${durationMonths > 1 ? 's' : ''}`;
+
+      const targetId = (user as any).id || (user as any)._id || (user as any).userId;
+      
+      const updatedUser = await User.findByIdAndUpdate(targetId, {
+        $set: {
+          isPro: true,
+          plan: 'pro',
+          proExpiresAt: newExpirationDate
+        }
+      }, { new: true });
+
+      console.log('✅ Coupon Redeemed! User isPro set to:', updatedUser?.isPro);
+
+      const { createNotification } = await import("./lib/actions/notification.actions");
+      await createNotification(targetId, '✨ Pro Unlocked!', 'Welcome to SpendSense Pro. Your limits have been removed.', 'billing');
+
+      res.json({ success: true, proExpiresAt: newExpirationDate, durationMonths });
+    } catch (error) {
+      res.status(400).json({ error: (error as Error).message });
+    }
+  });
+
+  // Admin APIs
+  app.get("/api/admin/data", async (req, res) => {
+    try {
+      const { getAdminData } = await import("./lib/actions/admin.actions");
+      const data = await getAdminData(req);
+      res.json(data);
+    } catch (error) {
+      if ((error as Error).message.includes("Unauthorized")) {
+        return res.status(400).json({ error: (error as Error).message });
+      }
+      res.status(400).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/admin/coupons", async (req, res) => {
+    try {
+      const { createCoupon } = await import("./lib/actions/admin.actions");
+      const coupon = await createCoupon(req, req.body);
+      res.status(201).json(coupon);
+    } catch (error) {
+      if ((error as Error).message.includes("Unauthorized")) {
+        return res.status(400).json({ error: (error as Error).message });
+      }
+      res.status(400).json({ error: (error as Error).message });
+    }
+  });
+
+  app.put("/api/admin/coupons/:id", async (req, res) => {
+    try {
+      const { toggleCouponStatus } = await import("./lib/actions/admin.actions");
+      const coupon = await toggleCouponStatus(req, req.params.id, req.body.isActive);
+      res.json(coupon);
+    } catch (error) {
+      if ((error as Error).message.includes("Unauthorized")) {
+        return res.status(400).json({ error: (error as Error).message });
+      }
+      res.status(400).json({ error: (error as Error).message });
+    }
+  });
+
+  app.put("/api/user/profile", async (req, res) => {
+    try {
+      const { updateUserProfile } = await import("./lib/actions/user.actions");
+      const user = await updateUserProfile(req, req.body);
+      res.json(user);
+    } catch (error) {
+      if ((error as Error).message.includes("Unauthorized")) {
+        return res.status(401).json({ error: (error as Error).message });
+      }
       res.status(400).json({ error: (error as Error).message });
     }
   });

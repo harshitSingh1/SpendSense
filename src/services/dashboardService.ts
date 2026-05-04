@@ -23,6 +23,7 @@ export async function saveCalendarNote(date: string, content: string) {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({ date, content }),
   });
 
@@ -35,17 +36,37 @@ export async function saveCalendarNote(date: string, content: string) {
 }
 
 export async function getDashboardMetrics(timeRange: 'monthly' | 'yearly' | 'all' = 'yearly'): Promise<DashboardMetrics> {
-  const response = await fetch(`/api/dashboard/data?timeRange=${timeRange}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  let retries = 3;
+  let lastError = null;
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to fetch dashboard metrics");
+  while (retries > 0) {
+    try {
+      const response = await fetch(`/api/dashboard/data?timeRange=${timeRange}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to fetch dashboard metrics (${response.status})`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      lastError = error;
+      if (error instanceof Error && (error.message.includes("Failed to fetch") || error.message.includes("NetworkError") || error.message.includes("fetch"))) {
+        retries--;
+        if (retries > 0) {
+          await new Promise(r => setTimeout(r, 1000));
+          continue;
+        }
+      }
+      throw error;
+    }
   }
-
-  return await response.json();
+  
+  throw lastError;
 }

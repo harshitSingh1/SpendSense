@@ -163,14 +163,17 @@ export const authConfig = {
     async jwt({ token, user, trigger }: any) {
       await dbConnect();
       
-      // Initial sign in or update
-      if (user || trigger === "update" || trigger === "signIn") {
-        const dbUser = await User.findOne({ email: token.email });
-        if (dbUser) {
-          token.userId = dbUser._id.toString();
-          token.name = dbUser.name;
-          token.picture = dbUser.image;
-        }
+      const dbUser = await User.findOne({ email: token.email });
+      if (dbUser) {
+        token.userId = dbUser._id.toString();
+        token.name = dbUser.name;
+        token.picture = dbUser.image;
+        token.isAdmin = dbUser.isAdmin;
+        // Compute active Pro status
+        const isActuallyPro = Boolean(dbUser.proExpiresAt && new Date(dbUser.proExpiresAt) > new Date());
+        token.isPro = dbUser.isPro || isActuallyPro;
+        token.plan = dbUser.plan;
+        token.proExpiresAt = dbUser.proExpiresAt;
       }
       
       return token;
@@ -180,6 +183,10 @@ export const authConfig = {
         (session.user as any).id = token.userId;
         session.user.name = token.name;
         session.user.image = token.picture;
+        (session.user as any).isAdmin = token.isAdmin;
+        (session.user as any).isPro = token.isPro;
+        (session.user as any).plan = token.plan;
+        (session.user as any).proExpiresAt = token.proExpiresAt;
       }
       return session;
     },

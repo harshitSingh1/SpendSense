@@ -47,7 +47,7 @@ To ensure users become fundamentally dependent on SpendSense AI for the next dec
 *   **Strategy:** Make the Omni-Tracker so comprehensive (Real Estate estimates via APIs, Crypto wallets, 401k/EPFO scrape) that recreating their net worth chart elsewhere becomes mathematically impossible. When you curate 5 years of perfect historical financial data, users will not churn.
 
 **B. Predictive Stocrates (Push vs. Pull)**
-*   **Strategy:** Don't wait for them to open the app. Stocrates needs to become proactive. Send weekly Push/Email notifications: *"You've burned ₹15,000 on Zomato this month—up 40%. Want me to freeze this budget category until next week?"* This establishes the "Institutional-Grade CFO" narrative, moving from a passive tracker to active intervention.
+*   **Strategy:** Don't wait for them to open the app. Stocrates needs to become proactive. Send weekly Push/Email notifications: *"You've burned ₹15,000 on Zomato this month - up 40%. Want me to freeze this budget category until next week?"* This establishes the "Institutional-Grade CFO" narrative, moving from a passive tracker to active intervention.
 
 **C. Automated Tax-Loss Harvesting Reports**
 *   **Strategy:** Every March or April, churn risk is highest. Generate one-click tax packages combining their investments and transaction behaviors. If you save them 4 hours during tax season by generating their P&L, they will easily justify the $129/year price tag.

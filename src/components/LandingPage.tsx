@@ -28,6 +28,8 @@ import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+import { Logo } from "./ui/Logo";
+
 const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour < 12) return "Good Morning";
@@ -47,13 +49,11 @@ export default function LandingPage({ onGetStarted, onViewTerms, onViewPrivacy, 
   return (
     <div className="flex flex-col min-h-screen bg-background selection:bg-indigo-500/30 selection:text-indigo-900 overflow-x-hidden">
       {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto max-w-7xl flex h-16 items-center justify-between px-6 md:px-10">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl shrink-0 h-16">
+        <div className="container mx-auto max-w-7xl flex h-full items-center justify-between px-6 md:px-10">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-            <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white">SpendSense</span>
+            <Logo className="h-8 w-8" />
+            <span className="text-xl font-sonsie tracking-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400">SpendSense</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-bold text-muted-foreground">
             <a href="#features" className="hover:text-indigo-600 transition-colors">Features</a>
@@ -66,7 +66,7 @@ export default function LandingPage({ onGetStarted, onViewTerms, onViewPrivacy, 
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         {/* 1. The Hero Section */}
         <section className="relative pt-6 pb-16 md:pt-12 overflow-hidden">
           <div className="container mx-auto px-6 md:px-10 max-w-7xl">
@@ -116,10 +116,8 @@ export default function LandingPage({ onGetStarted, onViewTerms, onViewPrivacy, 
                   <div className="w-64 bg-white dark:bg-zinc-950 border-r border-slate-200 dark:border-zinc-800 flex flex-col pt-8 pb-4 shrink-0 hidden sm:flex">
                       {/* Brand */}
                       <div className="flex items-center gap-3 mb-10 px-8">
-                         <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm">
-                           <TrendingUp className="h-5 w-5" />
-                         </div>
-                         <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">SpendSense</span>
+                         <Logo className="h-10 w-10 shrink-0" />
+                         <span className="font-sonsie tracking-normal text-2xl bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400">SpendSense</span>
                       </div>
                       
                       {/* Menu */}
@@ -490,10 +488,8 @@ export default function LandingPage({ onGetStarted, onViewTerms, onViewPrivacy, 
         <div className="container mx-auto px-6 md:px-10 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm">
-                <TrendingUp className="h-3 w-3" />
-              </div>
-              <span className="font-bold text-slate-900 dark:text-white">SpendSense</span>
+              <Logo className="h-6 w-6" />
+              <span className="font-sonsie tracking-normal text-lg bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400">SpendSense</span>
             </div>
             <div className="flex gap-8 text-sm font-bold text-muted-foreground">
               <button onClick={onViewTerms} className="hover:text-emerald-500 transition-colors">Terms</button>

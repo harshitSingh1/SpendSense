@@ -4,6 +4,8 @@ import { requireUser } from '../auth-utils';
 import ArsenalProgress from '../models/ArsenalProgress';
 import Tool from '../models/Tool';
 import { SEED_TOOLS } from '../data/seedTools';
+import { createNotification } from './notification.actions';
+import { calculateLevel } from '../utils/gamification';
 
 export async function getUserProgress(req: Request) {
   const user = await requireUser(req);
@@ -61,6 +63,7 @@ export async function completeModule(req: Request, slug: string, score: number) 
   let addedPoints = 0;
 
   if (score > previousScore) {
+    const previousPoints = progress.financialIq;
     addedPoints = (score - previousScore) * 10;
     progress.financialIq += addedPoints;
     
@@ -83,7 +86,17 @@ export async function completeModule(req: Request, slug: string, score: number) 
     }
     progress.financialIq = correctSum;
 
+    const newPoints = progress.financialIq;
     await progress.save();
+
+    const oldLevel = calculateLevel(previousPoints);
+    const newLevel = calculateLevel(newPoints);
+
+    if (newLevel.level > oldLevel.level) {
+      await createNotification((user as any).id, '🏆 Rank Up: ' + newLevel.title, 'Congratulations! You have reached a new tier in The Arsenal.', 'gamification');
+    }
+
+    await createNotification((user as any).id, '🎓 Course Completed!', 'You earned points for mastering this intelligence module.', 'gamification');
   } else if (!progress.moduleScores) {
     // Just in case it's an old record without moduleScores map
     progress.moduleScores = new Map();
@@ -201,6 +214,9 @@ export async function rateTool(req: Request, toolSlug: string, voteType: 'up' | 
     if (voteType === 'down') tool.downvotes += 1;
     await tool.save();
 
+    console.log('✅ HOOK FIRED: +10 Financial IQ Gained for user ', (user as any).id);
+    await createNotification((user as any).id, '+10 Financial IQ Gained', 'You earned points for reviewing a tool.', 'gamification');
+
     return { message: 'Tool rated. +10 IQ Points awarded!', pointsAwarded: 10, progress, tool };
   }
 
@@ -212,13 +228,14 @@ export async function rateTool(req: Request, toolSlug: string, voteType: 'up' | 
 
   if (existingVoteIndex === -1) {
     // Has not rated before
+    const previousPoints = progress.financialIq;
     progress.ratedTools.push({ toolId: toolSlug, vote: voteType });
     
     if (voteType === 'up') tool.upvotes += 1;
     if (voteType === 'down') tool.downvotes += 1;
     await tool.save();
 
-    // Repair incorrect 100-based financialIq
+    // Recalculate financialIq
     let correctSum = 0;
     if (progress.moduleScores) {
       Array.from(progress.moduleScores.values()).forEach((s: any) => correctSum += s * 10);
@@ -227,7 +244,19 @@ export async function rateTool(req: Request, toolSlug: string, voteType: 'up' | 
       correctSum += progress.ratedTools.length * 10;
     }
     progress.financialIq = correctSum;
+    const newPoints = progress.financialIq;
     await progress.save();
+
+    const oldLevel = calculateLevel(previousPoints);
+    const newLevel = calculateLevel(newPoints);
+
+    if (newLevel.level > oldLevel.level) {
+      await createNotification((user as any).id, '🏆 Rank Up: ' + newLevel.title, 'Congratulations! You have reached a new tier in The Arsenal.', 'gamification');
+    }
+
+    console.log('✅ HOOK FIRED: +10 Financial IQ Gained for user ', (user as any).id);
+    await createNotification((user as any).id, '+10 Financial IQ Gained', 'You earned points for reviewing a tool.', 'gamification');
+
     return { message: 'Tool rated. +10 IQ Points awarded!', pointsAwarded: 10, progress, tool };
   } else {
     // Has rated before
