@@ -671,16 +671,54 @@ Policy Text: ${policyText}`;
 
       const prompt = `Act as a fiduciary financial advisor. Based on Age ${age}, a monthly investment of ₹${monthlyAmount}, Risk Tolerance: ${riskTolerance}, and Primary Goal: ${primaryGoal}, output a recommended Boglehead-style ETF portfolio allocation. CRITICAL INSTRUCTIONS: Keep the entire response under 250 words. Do not write introductory or concluding paragraphs. Use a strict, highly scannable bullet-point format. Prioritize mathematical clarity over conversational fluff.`;
 
-      const result = await getAIClient().models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: prompt
-      });
+      let recommendation = "";
+      try {
+        const featherlessUrl = process.env.FEATHERLESS_BASE_URL || 'https://api.featherless.ai/v1';
+        const featherlessKey = process.env.FEATHERLESS_API_KEY;
+        
+        if (!featherlessKey) {
+          throw new Error("FEATHERLESS_API_KEY not configured");
+        }
 
-      if (!result || !result.text) {
-        throw new Error("AI failed to generate a plan. Please try again.");
+        const fRes = await fetch(`${featherlessUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${featherlessKey}`
+          },
+          body: JSON.stringify({
+            model: "meta-llama/Meta-Llama-3-8B-Instruct",
+            messages: [{ role: "user", content: prompt }]
+          })
+        });
+
+        if (!fRes.ok) {
+           const errText = await fRes.text();
+           throw new Error(`Featherless API Error: ${fRes.status} ${errText}`);
+        }
+        
+        const data = await fRes.json();
+        if (!data.choices?.[0]?.message?.content) {
+            throw new Error("Empty response from Featherless");
+        }
+        recommendation = data.choices[0].message.content;
+        console.log('🚀 AI Generation completed successfully via FEATHERLESS PRO.');
+      } catch (error: any) {
+        console.warn('⚠️ FEATHERLESS ERROR, falling back to Gemini:', error.message || error);
+        
+        const result = await getAIClient().models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: prompt
+        });
+
+        if (!result || !result.text) {
+          throw new Error("AI failed to generate a plan. Please try again.");
+        }
+        recommendation = result.text;
+        console.log('🔄 Fallback triggered: AI Generation completed via GOOGLE GEMINI SDK.');
       }
 
-      res.json({ recommendation: result.text });
+      res.json({ recommendation });
     } catch (error: any) {
       console.error('❌ Wealth Genesis Error:', error);
       const isApiKeyError = error.message?.includes("API key not valid") || 
@@ -749,35 +787,78 @@ Policy Text: ${policyText}`;
         }))
       ];
 
-      // 5. Call Gemini API
+      // 5. Call AI APIs
       let outputText = "";
       try {
-        const geminiMessages = history.map((m: any) => ({
-          role: m.role === "ai" || m.role === "assistant" || m.role === "model" ? "model" : "user",
-          parts: [{ text: m.content || m.parts?.[0]?.text || "" }]
-        }));
+        const featherlessUrl = process.env.FEATHERLESS_BASE_URL || 'https://api.featherless.ai/v1';
+        const featherlessKey = process.env.FEATHERLESS_API_KEY;
         
-        const response = await getAIClient().models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: geminiMessages,
-          config: { systemInstruction: systemMessage.content }
+        if (!featherlessKey) {
+          throw new Error("FEATHERLESS_API_KEY not configured");
+        }
+
+        const oaiMessages = [
+          { role: "system", content: systemMessage.content },
+          ...history.map((m: any) => ({
+            role: m.role === "ai" || m.role === "assistant" || m.role === "model" ? "assistant" : "user",
+            content: m.content || m.parts?.[0]?.text || ""
+          }))
+        ];
+
+        const fRes = await fetch(`${featherlessUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${featherlessKey}`
+          },
+          body: JSON.stringify({
+            model: "meta-llama/Meta-Llama-3-8B-Instruct",
+            messages: oaiMessages
+          })
         });
 
-        if (!response || !response.text) {
-          throw new Error("No response from AI assistant.");
+        if (!fRes.ok) {
+           const errText = await fRes.text();
+           throw new Error(`Featherless API Error: ${fRes.status} ${errText}`);
         }
+        
+        const data = await fRes.json();
+        if (!data.choices?.[0]?.message?.content) {
+            throw new Error("Empty response from Featherless");
+        }
+        outputText = data.choices[0].message.content;
+        console.log('🚀 AI Generation completed successfully via FEATHERLESS PRO.');
+      } catch (error: any) {
+        console.warn('⚠️ FEATHERLESS ERROR, falling back to Gemini:', error.message || error);
+        try {
+          const geminiMessages = history.map((m: any) => ({
+            role: m.role === "ai" || m.role === "assistant" || m.role === "model" ? "model" : "user",
+            parts: [{ text: m.content || m.parts?.[0]?.text || "" }]
+          }));
+          
+          const response = await getAIClient().models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: geminiMessages,
+            config: { systemInstruction: systemMessage.content }
+          });
 
-        outputText = response.text || "";
-      } catch (e: any) {
-        console.error("❌ Chat Gemini Error:", e);
-        const isApiKeyError = e.message?.includes("API key not valid") || 
-                             e.message?.includes("API_KEY_INVALID") ||
-                             JSON.stringify(e).includes("API_KEY_INVALID");
-                             
-        if (isApiKeyError) {
-          return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
+          if (!response || !response.text) {
+            throw new Error("No response from AI assistant.");
+          }
+
+          outputText = response.text || "";
+          console.log('🔄 Fallback triggered: AI Generation completed via GOOGLE GEMINI SDK.');
+        } catch (e: any) {
+          console.error("❌ Chat Gemini Error:", e);
+          const isApiKeyError = e.message?.includes("API key not valid") || 
+                               e.message?.includes("API_KEY_INVALID") ||
+                               JSON.stringify(e).includes("API_KEY_INVALID");
+                               
+          if (isApiKeyError) {
+            return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
+          }
+          return res.status(500).json({ error: e.message || String(e) || "Chat processing failed" });
         }
-        return res.status(500).json({ error: e.message || String(e) || "Chat processing failed" });
       }
 
       // Save AI Message

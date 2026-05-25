@@ -85,49 +85,53 @@ export default function CoachView({
 
   const isPro = !!user?.isPro;
 
-  const fetchUserStatus = async () => {
-    try {
-      const res = await fetch("/api/user/status", { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        setPromptCount(data.promptCountToday || 0);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const fetchHistory = async () => {
-    setIsLoadingHistory(true);
-    try {
-      const res = await fetch("/api/chat/history", { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.history && data.history.length > 0) {
-          const formattedHistory = data.history.map((m: any) => ({
-            id: m._id || `msg-${Math.random()}`,
-            role: m.role === "model" || m.role === "ai" ? "ai" : "user",
-            content: m.content,
-            timestamp: new Date(m.createdAt)
-          }));
-          setMessages(formattedHistory);
-        } else {
-          setMessages(INITIAL_MESSAGES);
-        }
-      } else {
-        setMessages(INITIAL_MESSAGES);
-      }
-    } catch (e) {
-      console.error(e);
-      setMessages(INITIAL_MESSAGES);
-    } finally {
-      setIsLoadingHistory(false);
-    }
-  };
-
   useEffect(() => {
-    fetchUserStatus();
-    fetchHistory();
+    let active = true;
+    
+    const doInit = async () => {
+      try {
+        const res = await fetch("/api/user/status", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          if (active) setPromptCount(data.promptCountToday || 0);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      if (active) setIsLoadingHistory(true);
+      try {
+        const res = await fetch("/api/chat/history", { credentials: "include" });
+        if (!active) return;
+        if (res.ok) {
+          const data = await res.json();
+          if (data.history && data.history.length > 0) {
+            const formattedHistory = data.history.map((m: any) => ({
+              id: m._id || `msg-${Math.random()}`,
+              role: m.role === "model" || m.role === "ai" ? "ai" : "user",
+              content: m.content,
+              timestamp: new Date(m.createdAt)
+            }));
+            if (active) setMessages(formattedHistory);
+          } else {
+            if (active) setMessages(INITIAL_MESSAGES);
+          }
+        } else {
+          if (active) setMessages(INITIAL_MESSAGES);
+        }
+      } catch (e) {
+        console.error(e);
+        if (active) setMessages(INITIAL_MESSAGES);
+      } finally {
+        if (active) setIsLoadingHistory(false);
+      }
+    };
+    
+    doInit();
+    
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
