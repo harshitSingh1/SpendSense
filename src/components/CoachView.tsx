@@ -170,8 +170,7 @@ export default function CoachView({
       timestamp: new Date(),
     };
 
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
+    setMessages((prev) => [...prev, userMsg]);
     setInputValue("");
     setIsLoading(true);
 
@@ -181,7 +180,7 @@ export default function CoachView({
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         // Send the complete conversation history including the new user message
-        body: JSON.stringify({ history: newMessages })
+        body: JSON.stringify({ history: [...messages, userMsg] })
       });
 
       if (res.status === 429) {
