@@ -19,7 +19,7 @@ import SpendingDonutChart from "./dashboard/SpendingDonutChart";
 import CashflowTrendChart from "./dashboard/CashflowTrendChart";
 import RecentActivityWidget from "./dashboard/RecentActivityWidget";
 import { FinancialCalendar } from "./dashboard/FinancialCalendar";
-import { getDashboardMetrics } from "../services/dashboardService";
+import { getDashboardMetrics, saveCalendarNote } from "../services/dashboardService";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -212,7 +212,7 @@ export default function DashboardView() {
                 calendarNotes={metrics?.calendarNotes || {}} 
                 monthlyTransactions={metrics?.monthlyTransactions || []}
                 onSaveNote={async (date, content) => {
-                   await import('../services/dashboardService').then(m => m.saveCalendarNote(date, content));
+                   await saveCalendarNote(date, content);
                 }}
               />
             </div>
