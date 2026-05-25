@@ -75,9 +75,10 @@ export default function CoachView({
   initialQuery?: string, 
   onQueryHandled?: () => void 
 }) {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [promptCount, setPromptCount] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -96,16 +97,56 @@ export default function CoachView({
     }
   };
 
+  const fetchHistory = async () => {
+    setIsLoadingHistory(true);
+    try {
+      const res = await fetch("/api/chat/history", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.history && data.history.length > 0) {
+          const formattedHistory = data.history.map((m: any) => ({
+            id: m._id || `msg-${Math.random()}`,
+            role: m.role === "model" || m.role === "ai" ? "ai" : "user",
+            content: m.content,
+            timestamp: new Date(m.createdAt)
+          }));
+          setMessages(formattedHistory);
+        } else {
+          setMessages(INITIAL_MESSAGES);
+        }
+      } else {
+        setMessages(INITIAL_MESSAGES);
+      }
+    } catch (e) {
+      console.error(e);
+      setMessages(INITIAL_MESSAGES);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
   useEffect(() => {
     fetchUserStatus();
+    fetchHistory();
   }, []);
 
   useEffect(() => {
-    if (initialQuery && !isLoading && !isLocked) {
-      handleSend(initialQuery);
+    const params = new URLSearchParams(window.location.search);
+    const queryParam = params.get('q');
+    const queryToSend = queryParam || initialQuery;
+
+    if (queryToSend && !isLoading && !isLoadingHistory && !isLocked) {
+      handleSend(queryToSend);
       onQueryHandled?.();
+
+      if (queryParam) {
+        params.delete('q');
+        const newSearch = params.toString();
+        const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+        window.history.replaceState({}, '', newUrl);
+      }
     }
-  }, [initialQuery, isLoading, isLocked]);
+  }, [initialQuery, isLoading, isLoadingHistory, isLocked]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -224,75 +265,82 @@ export default function CoachView({
       {/* Message Area */}
         <div className="flex-1 overflow-y-auto px-4 py-8 md:px-8 space-y-8 scrollbar-hide">
           <div className="w-full max-w-3xl mx-auto flex flex-col space-y-8">
-          <AnimatePresence initial={false}>
-            {messages.map((msg) => (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, y: 15, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} items-start gap-4 md:gap-6`}
-              >
-                {msg.role === "ai" && (
+          {isLoadingHistory ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400 space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin text-slate-300 dark:text-slate-600" />
+              <p className="text-sm font-medium">Recalling past wisdom...</p>
+            </div>
+          ) : (
+            <AnimatePresence initial={false}>
+              {messages.map((msg) => (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} items-start gap-4 md:gap-6`}
+                >
+                  {msg.role === "ai" && (
+                    <div className="mt-1 h-10 w-10 shrink-0 flex items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-emerald-500 text-white shadow-lg">
+                      <StocratesIcon className="h-5 w-5" />
+                    </div>
+                  )}
+                  <div className="max-w-[90%] md:max-w-[80%] space-y-2">
+                    <div className={`
+                      p-4 md:p-5 text-sm md:text-base leading-relaxed break-words shadow-sm border
+                      ${msg.role === "user" 
+                        ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white rounded-[1.5rem] rounded-tr-sm border-transparent" 
+                        : "bg-transparent text-slate-800 dark:text-slate-200 border-none px-0 shadow-none -ml-2"}
+                    `}>
+                      {msg.role === 'ai' ? (
+                        <div className="prose prose-sm md:prose-base dark:prose-invert prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-white max-w-none">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      )}
+                    </div>
+                    <p className={`px-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 ${msg.role === "user" ? "text-right" : "text-left"}`}>
+                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+              {isLoading && (
+                <motion.div 
+                  key="ai-loading-indicator"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="flex justify-start items-start gap-4 md:gap-6"
+                >
                   <div className="mt-1 h-10 w-10 shrink-0 flex items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-emerald-500 text-white shadow-lg">
                     <StocratesIcon className="h-5 w-5" />
                   </div>
-                )}
-                <div className="max-w-[90%] md:max-w-[80%] space-y-2">
-                  <div className={`
-                    p-4 md:p-5 text-sm md:text-base leading-relaxed break-words shadow-sm border
-                    ${msg.role === "user" 
-                      ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white rounded-[1.5rem] rounded-tr-sm border-transparent" 
-                      : "bg-transparent text-slate-800 dark:text-slate-200 border-none px-0 shadow-none -ml-2"}
-                  `}>
-                    {msg.role === 'ai' ? (
-                      <div className="prose prose-sm md:prose-base dark:prose-invert prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-white max-w-none">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div>
-                    ) : (
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
-                    )}
+                  <div className="bg-transparent px-2 py-4">
+                    <div className="flex gap-1.5 items-center">
+                      <motion.div 
+                        animate={{ scale: [1, 1.2, 1] }} 
+                        transition={{ duration: 0.6, repeat: Infinity }} 
+                        className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" 
+                      />
+                      <motion.div 
+                        animate={{ scale: [1, 1.2, 1] }} 
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }} 
+                        className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" 
+                      />
+                      <motion.div 
+                        animate={{ scale: [1, 1.2, 1] }} 
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }} 
+                        className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" 
+                      />
+                    </div>
                   </div>
-                  <p className={`px-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 ${msg.role === "user" ? "text-right" : "text-left"}`}>
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-            {isLoading && (
-              <motion.div 
-                key="ai-loading-indicator"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="flex justify-start items-start gap-4 md:gap-6"
-              >
-                <div className="mt-1 h-10 w-10 shrink-0 flex items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-emerald-500 text-white shadow-lg">
-                  <StocratesIcon className="h-5 w-5" />
-                </div>
-                <div className="bg-transparent px-2 py-4">
-                  <div className="flex gap-1.5 items-center">
-                    <motion.div 
-                      animate={{ scale: [1, 1.2, 1] }} 
-                      transition={{ duration: 0.6, repeat: Infinity }} 
-                      className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" 
-                    />
-                    <motion.div 
-                      animate={{ scale: [1, 1.2, 1] }} 
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }} 
-                      className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" 
-                    />
-                    <motion.div 
-                      animate={{ scale: [1, 1.2, 1] }} 
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }} 
-                      className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" 
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-            <div ref={messagesEndRef} />
-          </AnimatePresence>
+                </motion.div>
+              )}
+              <div ref={messagesEndRef} />
+            </AnimatePresence>
+          )}
           </div>
         </div>
 

@@ -23,10 +23,13 @@ import AIPolicyAuditorTease from "./AIPolicyAuditorTease";
 import PolicyScanner from "./PolicyScanner";
 import { useCurrency, formatMoney } from "@/lib/utils/currency";
 
+import ClaimEnforcer from "./ClaimEnforcer";
+
 export default function ShieldView({ user, setActiveTab }: { user?: any, setActiveTab?: any }) {
   const userRegion = useCurrency();
   const [metrics, setMetrics] = useState<ProtectionMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTool, setActiveTool] = useState<'auditor' | 'enforcer'>('auditor');
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -200,11 +203,32 @@ export default function ShieldView({ user, setActiveTab }: { user?: any, setActi
         setActiveTab={setActiveTab}
       />
 
-      {user?.isPro ? (
-        <PolicyScanner />
-      ) : (
-        <AIPolicyAuditorTease />
-      )}
+      <div className="pt-8">
+        {user?.isPro && (
+          <div className="flex justify-center md:justify-start mb-6">
+            <div className="flex gap-1 p-1 bg-slate-100 dark:bg-zinc-900 rounded-full w-fit border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+              <button 
+                onClick={() => setActiveTool('auditor')}
+                className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-black tracking-tight transition-all truncate ${activeTool === 'auditor' ? 'bg-white dark:bg-zinc-800 shadow-sm text-indigo-700 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+              >
+                Policy Auditor
+              </button>
+              <button 
+                onClick={() => setActiveTool('enforcer')}
+                className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-black tracking-tight transition-all truncate ${activeTool === 'enforcer' ? 'bg-white dark:bg-zinc-800 shadow-sm text-red-600 dark:text-red-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+              >
+                Claim Enforcer
+              </button>
+            </div>
+          </div>
+        )}
+
+        {activeTool === 'auditor' || !user?.isPro ? (
+          <PolicyScanner user={user} />
+        ) : (
+          <ClaimEnforcer user={user} />
+        )}
+      </div>
     </div>
   );
 }

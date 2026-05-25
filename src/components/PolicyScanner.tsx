@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import Markdown from "react-markdown";
 
-export default function PolicyScanner() {
+export default function PolicyScanner({ user }: { user?: any }) {
+  const isPro = !!user?.isPro;
   const [policyText, setPolicyText] = useState("");
   const [policyType, setPolicyType] = useState("Health Insurance");
   
@@ -152,9 +153,30 @@ export default function PolicyScanner() {
             )}
             
             {result && !isLoading && (
-              <div className="p-8 prose prose-slate dark:prose-invert prose-headings:font-black prose-a:text-indigo-500 max-w-none h-full overflow-y-auto">
-                <Markdown>{result}</Markdown>
-              </div>
+              <>
+                <div className={`p-8 prose prose-slate dark:prose-invert prose-headings:font-black prose-a:text-indigo-500 max-w-none h-full overflow-y-auto ${!isPro ? "blur-[5px] select-none pointer-events-none" : ""}`}>
+                  <Markdown>{result}</Markdown>
+                </div>
+                {!isPro && (
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 bg-white/20 dark:bg-black/20 backdrop-blur-[2px]">
+                    <div className="bg-white dark:bg-zinc-900 border border-indigo-500/30 p-8 rounded-3xl shadow-2xl max-w-sm text-center">
+                      <div className="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <ShieldAlert className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Hidden Clauses Detected</h3>
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+                        🚨 Stocrates found potential loopholes in your policy. Upgrade to SpendSense Pro to reveal hidden clauses and sub-limits.
+                      </p>
+                      <Button onClick={() => {
+                        window.history.pushState({}, '', '/pro');
+                        window.dispatchEvent(new CustomEvent('navigate', { detail: 'pro' }));
+                      }} className="w-full h-14 rounded-2xl font-bold text-base bg-indigo-600 hover:bg-indigo-700 text-white shadow-[0_0_30px_-5px_rgba(79,70,229,0.5)] transition-all">
+                        Unlock Full Report
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

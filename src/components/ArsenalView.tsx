@@ -119,7 +119,7 @@ export default function ArsenalView() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="space-y-12 animate-in fade-in duration-1000"
+            className="-mt-4 sm:-mt-8 md:-mt-10 lg:-mt-12 space-y-8 sm:space-y-12"
           >
             {/* The Hero Header */}
             <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] rounded-3xl sm:rounded-[2.5rem] bg-indigo-950 text-white overflow-hidden relative pb-2 sm:pb-4">
@@ -144,19 +144,19 @@ export default function ArsenalView() {
             </Card>
 
             {/* Tabbed Navigation */}
-            <div className="flex justify-center sm:justify-start">
-              <div className="flex gap-1 p-1 bg-slate-100 dark:bg-zinc-900 rounded-full w-fit border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+            <div className="sticky top-0 sm:top-2 z-50 mx-auto max-w-md w-full my-4 sm:my-8">
+              <div className="backdrop-blur-xl bg-slate-900/90 border border-white/20 p-1.5 rounded-full grid grid-cols-2 gap-1 shadow-2xl">
                 <button 
                   onClick={() => setActiveTab('core')}
-                  className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-black tracking-tight transition-all truncate ${activeTab === 'core' ? 'bg-white dark:bg-zinc-800 shadow-sm text-indigo-700 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                  className={`text-lg font-semibold py-3 rounded-full transition-all duration-300 ${activeTab === 'core' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                 >
-                  Intelligence
+                  🧠 Core Intelligence
                 </button>
                 <button 
                   onClick={() => setActiveTab('tools')}
-                  className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-black tracking-tight transition-all truncate ${activeTab === 'tools' ? 'bg-white dark:bg-zinc-800 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                  className={`text-lg font-semibold py-3 rounded-full transition-all duration-300 ${activeTab === 'tools' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                 >
-                  Tools
+                  🛠️ Tactical Tools
                 </button>
               </div>
             </div>

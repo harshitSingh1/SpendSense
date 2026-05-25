@@ -23,18 +23,20 @@ let aiClient: GoogleGenAI | null = null;
 function getAIClient() {
   if (!aiClient) {
     const rawKey = process.env.GEMINI_API_KEY || (process.env as any).VITE_GEMINI_API_KEY || (process.env as any).NEXT_PUBLIC_GEMINI_API_KEY;
+    const apiKey = typeof rawKey === 'string' ? rawKey.trim().replace(/^["']|["']$/g, '') : undefined;
     
-    let apiKey = typeof rawKey === 'string' ? rawKey.trim().replace(/^["']|["']$/g, '') : undefined;
-
-    // Strict validation: Must look like a real key
-    if (!apiKey || !apiKey.startsWith('AIza') || apiKey.length < 20) {
-      console.warn(`[AI] Invalid API Key detected: ${apiKey ? apiKey.substring(0, 4) + '...' : 'MISSING'}`);
-      // Don't cache the client if the key is invalid, so we can try again if env changes
-      return new GoogleGenAI({ apiKey: apiKey || '' });
+    if (!apiKey || apiKey.length < 20 || apiKey.includes('YOUR_API_KEY') || !apiKey.startsWith('AIza')) {
+      throw new Error(`API_KEY_INVALID: Please configure a valid GEMINI_API_KEY in Settings. Current key is missing or invalid.`);
     }
 
-    console.log(`[AI] Initializing with key starting with: ${apiKey.substring(0, 4)} (len: ${apiKey.length})`);
-    aiClient = new GoogleGenAI({ apiKey });
+    aiClient = new GoogleGenAI({
+      apiKey: apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build'
+        }
+      }
+    });
   }
   return aiClient;
 }
@@ -204,6 +206,65 @@ async function startServer() {
     } catch (error) {
       console.error('❌ Monthly Digest CRON Failed:', error);
       res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  // 3.2 CRON - Daily Market Brief for Pro Users
+  app.post("/api/cron/market-brief", async (req, res) => {
+    try {
+      const authHeader = req.headers['authorization'];
+      const secret = process.env.CRON_SECRET;
+      
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        console.warn('⚠️ Unauthorized CRON attempt (Market Brief)');
+        return res.status(401).json({ error: "Unauthorized CRON execution." });
+      }
+
+      let aiInsight = "The market rewards patience and consistent strategy over time.";
+      
+      if (process.env.GEMINI_API_KEY) {
+        const aiClient = getAIClient();
+        const prompt = "Generate a short, generic daily financial wisdom quote or market brief (max 2 sentences).";
+        
+        const response = await aiClient.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: prompt,
+        });
+        
+        if (response && response.text) {
+          aiInsight = response.text.trim();
+        }
+      }
+
+      await dbConnect();
+      const User = (await import("./lib/models/User")).default;
+      const NotificationModel = (await import("./lib/models/Notification")).default;
+
+      const now = new Date();
+      const proUsers = await User.find({
+        $or: [
+          { isPro: true },
+          { proExpiresAt: { $gt: now } }
+        ]
+      }, '_id');
+
+      if (proUsers.length > 0) {
+        const insertDocs = proUsers.map(user => ({
+          userId: user._id,
+          title: '📈 Daily Market Brief',
+          message: aiInsight,
+          type: 'system',
+          isRead: false,
+          createdAt: new Date(),
+        }));
+        await NotificationModel.insertMany(insertDocs);
+      }
+
+      console.log(`✅ Daily Market Brief sent to ${proUsers.length} Pro users.`);
+      res.json({ success: true, count: proUsers.length, insight: aiInsight });
+    } catch (error: any) {
+      console.error('❌ Daily Market Brief CRON Failed:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 
@@ -437,9 +498,7 @@ async function startServer() {
       const dbUser = await User.findById(targetId);
 
       const isUserPro = dbUser?.isPro || (dbUser?.proExpiresAt && new Date(dbUser.proExpiresAt) > new Date());
-      if (!isUserPro) {
-        return res.status(400).json({ error: "Policy Auditor is highly guarded and strictly reserved for SpendSense Pro members." });
-      }
+
 
       const { policyText, policyType } = req.body;
 
@@ -452,7 +511,7 @@ async function startServer() {
 Policy Text: ${policyText}`;
 
       const response = await getAIClient().models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-3.5-flash",
         contents: prompt,
       });
 
@@ -471,6 +530,102 @@ Policy Text: ${policyText}`;
         return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
       }
       res.status(500).json({ error: error.message || String(error) || "Failed to scan policy." });
+    }
+  });
+
+  app.post("/api/protection/enforce", async (req, res) => {
+    try {
+      const user = await requireUser(req);
+      await dbConnect();
+      const User = (await import("./lib/models/User")).default;
+      
+      const targetId = (user as any).id || (user as any)._id || (user as any).userId;
+      const dbUser = await User.findById(targetId);
+
+      const isUserPro = dbUser?.isPro || (dbUser?.proExpiresAt && new Date(dbUser.proExpiresAt) > new Date());
+      
+      if (!isUserPro) {
+        return res.status(403).json({ error: "Claim Enforcer is strictly reserved for SpendSense Pro members." });
+      }
+
+      const { claimAmount, rejectionLetter } = req.body;
+
+      if (!claimAmount || !rejectionLetter) {
+        return res.status(400).json({ error: "Missing required parameters." });
+      }
+
+      const prompt = `Act as a fierce insurance regulatory lawyer in India. Analyze this rejection letter for a claim amount of ₹${claimAmount}: 
+      
+      ${rejectionLetter}
+      
+      Draft a formal, highly assertive Grievance Redressal email to the Insurance Nodal Officer demanding the claim be honored. Cite IRDAI guidelines where applicable. Tone: Professional but threatening legal action. Make it ready to be copied and pasted in an email body.`;
+
+      const response = await getAIClient().models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+      });
+
+      if (!response || !response.text) {
+        throw new Error("Empty response from AI model.");
+      }
+
+      res.json({ response: response.text });
+    } catch (error: any) {
+      console.error("❌ Claim Enforcer Error:", error);
+      const isApiKeyError = error.message?.includes("API key not valid") || 
+                           error.message?.includes("API_KEY_INVALID") ||
+                           JSON.stringify(error).includes("API_KEY_INVALID");
+      
+      if (isApiKeyError) {
+        return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
+      }
+      res.status(500).json({ error: error.message || String(error) || "Failed to draft grievance." });
+    }
+  });
+
+  app.post("/api/tax/optimize", async (req, res) => {
+    try {
+      const user = await requireUser(req);
+      await dbConnect();
+      const User = (await import("./lib/models/User")).default;
+      
+      const targetId = (user as any).id || (user as any)._id || (user as any).userId;
+      const dbUser = await User.findById(targetId);
+
+      const isUserPro = dbUser?.isPro || (dbUser?.proExpiresAt && new Date(dbUser.proExpiresAt) > new Date());
+      
+      if (!isUserPro) {
+        return res.status(403).json({ error: "Tax Optimizer is strictly reserved for SpendSense Pro members." });
+      }
+
+      const { ctc, basic, hra, eightyC } = req.body;
+
+      if (!ctc || !basic || !hra || !eightyC) {
+        return res.status(400).json({ error: "Missing required parameters." });
+      }
+
+      const prompt = `Act as a Chartered Accountant in India. Based on CTC: ₹${ctc}, Basic: ₹${basic}, HRA: ₹${hra}, and 80C: ₹${eightyC}. Calculate the most efficient tax regime (Old vs New). Suggest specific salary restructuring (e.g., adding Food Coupons, LTA, NPS under 80CCD(1B)) to legally minimize taxes. Format in Markdown. Highlight the 'Estimated Tax Saved (₹)' exactly like that in the response to emphasize it. Use bold styling for amounts where it makes sense to draw attention to savings.`;
+
+      const response = await getAIClient().models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+      });
+
+      if (!response || !response.text) {
+        throw new Error("Empty response from AI model.");
+      }
+
+      res.json({ response: response.text });
+    } catch (error: any) {
+      console.error("❌ Tax Optimizer Error:", error);
+      const isApiKeyError = error.message?.includes("API key not valid") || 
+                           error.message?.includes("API_KEY_INVALID") ||
+                           JSON.stringify(error).includes("API_KEY_INVALID");
+      
+      if (isApiKeyError) {
+        return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
+      }
+      res.status(500).json({ error: error.message || String(error) || "Failed to optimize taxes." });
     }
   });
 
@@ -517,7 +672,7 @@ Policy Text: ${policyText}`;
       const prompt = `Act as a fiduciary financial advisor. Based on Age ${age}, a monthly investment of ₹${monthlyAmount}, Risk Tolerance: ${riskTolerance}, and Primary Goal: ${primaryGoal}, output a recommended Boglehead-style ETF portfolio allocation. CRITICAL INSTRUCTIONS: Keep the entire response under 250 words. Do not write introductory or concluding paragraphs. Use a strict, highly scannable bullet-point format. Prioritize mathematical clarity over conversational fluff.`;
 
       const result = await getAIClient().models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-3.5-flash',
         contents: prompt
       });
 
@@ -539,7 +694,23 @@ Policy Text: ${policyText}`;
     }
   });
 
-  // 4.3 AI Chat Route with Context Injection
+  // 4.3 AI Chat Route & History
+  app.get("/api/chat/history", authenticateChatUser, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      await dbConnect();
+      const ChatMessage = (await import("./lib/models/ChatMessage")).default;
+      
+      const messages = await ChatMessage.find({ userId: user.id })
+        .sort({ createdAt: 1 })
+        .limit(40);
+        
+      res.json({ history: messages });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch history" });
+    }
+  });
+
   app.post("/api/chat", authenticateChatUser, chatRateLimiter, async (req, res) => {
     try {
       // 1. User is already authenticated and attached by the middleware
@@ -562,11 +733,18 @@ Policy Text: ${policyText}`;
       };
 
       const { history } = req.body;
+      const prompt = history[history.length - 1].content;
       
+      await dbConnect();
+      const ChatMessage = (await import("./lib/models/ChatMessage")).default;
+      
+      // Save User Message
+      await ChatMessage.create({ userId: user.id, role: 'user', content: prompt });
+
       const messages = [
         systemMessage,
         ...history.map((m: any) => ({
-          role: m.role === "ai" || m.role === "assistant" ? "assistant" as const : "user" as const,
+          role: m.role === "ai" || m.role === "assistant" || m.role === "model" ? "assistant" as const : "user" as const,
           content: m.content || m.parts?.[0]?.text || ""
         }))
       ];
@@ -575,12 +753,12 @@ Policy Text: ${policyText}`;
       let outputText = "";
       try {
         const geminiMessages = history.map((m: any) => ({
-          role: m.role === "ai" || m.role === "assistant" ? "model" : "user",
+          role: m.role === "ai" || m.role === "assistant" || m.role === "model" ? "model" : "user",
           parts: [{ text: m.content || m.parts?.[0]?.text || "" }]
         }));
         
         const response = await getAIClient().models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-3.5-flash",
           contents: geminiMessages,
           config: { systemInstruction: systemMessage.content }
         });
@@ -600,6 +778,17 @@ Policy Text: ${policyText}`;
           return res.status(401).json({ error: "API key is invalid. Please configure a valid GEMINI_API_KEY." });
         }
         return res.status(500).json({ error: e.message || String(e) || "Chat processing failed" });
+      }
+
+      // Save AI Message
+      await ChatMessage.create({ userId: user.id, role: 'model', content: outputText });
+
+      // Auto-pruning hook
+      const messageCount = await ChatMessage.countDocuments({ userId: user.id });
+      if (messageCount > 40) {
+        const messagesToKeep = await ChatMessage.find({ userId: user.id }).sort({ createdAt: -1 }).limit(40).select('_id');
+        const keepIds = messagesToKeep.map((m: any) => m._id);
+        await ChatMessage.deleteMany({ userId: user.id, _id: { $nin: keepIds } });
       }
 
       res.json({ message: outputText, text: outputText });

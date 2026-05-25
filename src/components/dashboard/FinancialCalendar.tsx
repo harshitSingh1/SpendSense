@@ -5,6 +5,7 @@ import { StickyNote, Plus, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 
 interface FinancialCalendarProps {
   dailyCashflow: { date: string; income: number; expense: number }[];
@@ -19,6 +20,11 @@ export function FinancialCalendar({ dailyCashflow, calendarNotes, monthlyTransac
   const [noteContent, setNoteContent] = useState("");
   const [isPending, startTransition] = React.useTransition();
   const [isNoteSuccess, setIsNoteSuccess] = useState(false);
+  const [localNotes, setLocalNotes] = useState<Record<string, string>>(calendarNotes);
+
+  React.useEffect(() => {
+    setLocalNotes(calendarNotes);
+  }, [calendarNotes]);
 
   const currentYearValue = new Date().getFullYear();
   const YEARS = Array.from({ length: 16 }).map((_, i) => currentYearValue - 5 + i);
@@ -67,26 +73,48 @@ export function FinancialCalendar({ dailyCashflow, calendarNotes, monthlyTransac
   React.useEffect(() => {
     if (selectedDate) {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
-      setNoteContent(calendarNotes[dateStr] || "");
+      setNoteContent(localNotes[dateStr] || "");
     } else {
       setNoteContent("");
     }
-  }, [selectedDate, calendarNotes]);
+  }, [selectedDate, localNotes]);
 
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     if (!selectedDate) return;
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
-    if (!noteContent && !calendarNotes[dateStr]) return; // Nothing to save
+    if (!noteContent && !localNotes[dateStr]) return; // Nothing to save
 
-    startTransition(async () => {
-      try {
-        await onSaveNote(dateStr, noteContent);
-        setIsNoteSuccess(true);
-        setTimeout(() => setIsNoteSuccess(false), 2000);
-      } catch (error) {
-        console.error("Failed to save note:", error);
-      }
-    });
+    const previousNote = localNotes[dateStr];
+    const newNoteContent = noteContent;
+
+    // Optimistic State Update
+    setLocalNotes(prev => ({
+      ...prev,
+      [dateStr]: newNoteContent
+    }));
+
+    // Clear Input
+    setNoteContent("");
+    setIsNoteSuccess(true);
+    setTimeout(() => setIsNoteSuccess(false), 2000);
+    setSelectedDate(null);
+
+    // Background Sync
+    try {
+      await onSaveNote(dateStr, newNoteContent);
+    } catch (error) {
+      console.error("Failed to save note:", error);
+      toast.error('Failed to save memo');
+      setLocalNotes(prev => {
+        const reverted = { ...prev };
+        if (previousNote) {
+          reverted[dateStr] = previousNote;
+        } else {
+          delete reverted[dateStr];
+        }
+        return reverted;
+      });
+    }
   };
 
   const selectedDateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '';
@@ -151,7 +179,7 @@ export function FinancialCalendar({ dailyCashflow, calendarNotes, monthlyTransac
                 const isDate = day as Date;
                 const dateStr = format(isDate, 'yyyy-MM-dd');
                 const data = cashflowDict[dateStr];
-                const hasNote = !!calendarNotes[dateStr];
+                const hasNote = !!localNotes[dateStr];
                 const isSelected = selectedDate ? isSameDay(isDate, selectedDate) : false;
                 const isCurrentToday = isToday(isDate);
                 
@@ -269,7 +297,7 @@ export function FinancialCalendar({ dailyCashflow, calendarNotes, monthlyTransac
                
                <Button 
                  onClick={handleSaveNote} 
-                 disabled={isPending || (!noteContent && !calendarNotes[selectedDateStr])}
+                 disabled={isPending || (!noteContent && !localNotes[selectedDateStr])}
                  className={`w-full rounded-xl font-bold shadow-md transition-all ${isNoteSuccess ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20' : 'bg-primary shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]'}`}
                >
                  {isPending ? (

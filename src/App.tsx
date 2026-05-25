@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   BookOpen,
   Sparkles,
+  Calculator,
   PanelLeft,
   PanelLeftClose,
   Terminal,
@@ -39,6 +40,7 @@ import ShieldView from "./components/ShieldView";
 import ArsenalView from "./components/ArsenalView";
 import ProfileView from "./components/ProfileView";
 import GoalsView from "./components/GoalsView";
+import TaxOptimizerView from "./components/TaxOptimizerView";
 import ProUpgradeView from "./components/ProUpgradeView";
 import TermsPage from "./components/TermsPage";
 import PrivacyPage from "./components/PrivacyPage";
@@ -364,6 +366,7 @@ export default function App() {
                      <NavItem active={activeTab === "goals"} onClick={() => { setActiveTab("goals"); }} icon={<PiggyBank className="h-4 w-4" />} label="Piggy Banks" />
                      <NavItem active={activeTab === "wealth"} onClick={() => { setActiveTab("wealth"); }} icon={<Coins className="h-4 w-4" />} label="Wealth Engine" />
                      <NavItem active={activeTab === "shield"} onClick={() => { setActiveTab("shield"); }} icon={<ShieldCheck className="h-4 w-4" />} label="Protection" />
+                     <NavItem active={activeTab === "tax"} onClick={() => { setActiveTab("tax"); }} icon={<Calculator className="h-4 w-4" />} label="Tax Optimizer" />
                      <NavItem active={activeTab === "arsenal"} onClick={() => { setActiveTab("arsenal"); }} icon={<BookOpen className="h-4 w-4" />} label="The Arsenal" />
                   </div>
 
@@ -554,6 +557,13 @@ export default function App() {
               isCollapsed={isSidebarCollapsed}
             />
             <NavItem 
+              active={activeTab === "tax"} 
+              onClick={() => setActiveTab("tax")} 
+              icon={<Calculator className="h-4 w-4" />} 
+              label="Tax Optimizer" 
+              isCollapsed={isSidebarCollapsed}
+            />
+            <NavItem 
               active={activeTab === "arsenal"} 
               onClick={() => setActiveTab("arsenal")} 
               icon={<BookOpen className="h-4 w-4" />} 
@@ -646,6 +656,8 @@ export default function App() {
               <div><InvestView user={user} setActiveTab={setActiveTab} /></div>
             ) : activeTab === "shield" ? (
               <div><ShieldView user={user} setActiveTab={setActiveTab} /></div>
+            ) : activeTab === "tax" ? (
+              <div><TaxOptimizerView user={user} setActiveTab={setActiveTab} /></div>
             ) : activeTab === "analytics" ? (
               <CoachView user={user} setActiveTab={setActiveTab} initialQuery={searchQuery} onQueryHandled={() => setSearchQuery("")} />
             ) : activeTab === "arsenal" ? (

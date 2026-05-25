@@ -123,7 +123,7 @@ export default function GoalsView({ user, setActiveTab }: GoalsViewProps) {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ delay: idx * 0.1, duration: 0.5 }}
               >
-                <GoalCard goal={goal} onUpdate={fetchGoals} />
+                <GoalCard goal={goal} onUpdate={fetchGoals} isPro={isPro} />
               </motion.div>
             ))}
           </AnimatePresence>

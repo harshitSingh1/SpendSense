@@ -48,9 +48,10 @@ const iconMap: Record<string, React.ReactNode> = {
 interface GoalCardProps {
   goal: GoalData;
   onUpdate?: () => void;
+  isPro?: boolean;
 }
 
-export default function GoalCard({ goal, onUpdate }: GoalCardProps) {
+export default function GoalCard({ goal, onUpdate, isPro = false }: GoalCardProps) {
   const [isFunding, setIsFunding] = useState(false);
   const [fundAmount, setFundAmount] = useState("");
   const [open, setOpen] = useState(false);
@@ -67,6 +68,7 @@ export default function GoalCard({ goal, onUpdate }: GoalCardProps) {
 
   const percentage = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100);
   const leftAmount = Math.max(goal.targetAmount - goal.currentAmount, 0);
+  const inflationLoss = goal.currentAmount * 0.06;
 
   const handleFund = async () => {
     const amount = parseFloat(fundAmount);
@@ -163,6 +165,27 @@ export default function GoalCard({ goal, onUpdate }: GoalCardProps) {
               transition={{ duration: 1, ease: "easeOut" }}
               className="h-full bg-emerald-500"
             />
+          </div>
+          
+          <div className="pt-2 text-[10px] sm:text-xs font-medium leading-relaxed">
+            {goal.currentAmount === 0 ? (
+              <span className="text-slate-500 dark:text-slate-400 italic">
+                🌱 Deposit funds to unlock AI wealth protection insights for your '{goal.title}' goal.
+              </span>
+            ) : !isPro ? (
+              <span className="text-red-500/80 dark:text-red-400/80 italic">
+                ⚠️ Your ₹{goal.currentAmount.toLocaleString()} is losing ~₹{inflationLoss.toLocaleString(undefined, { maximumFractionDigits: 0 })} in purchasing power yearly. Unlock Pro to see Liquid Fund alternatives.
+              </span>
+            ) : (
+              <span className="text-emerald-700 dark:text-emerald-400 block p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-100 dark:border-emerald-500/20">
+                💡 Protect this ₹{goal.currentAmount.toLocaleString()}: Stocrates suggests optimizing your '{goal.title}' capital in a high-yield Arbitrage or Liquid Fund. <span className="font-bold underline cursor-pointer hover:text-emerald-800 dark:hover:text-emerald-300" onClick={() => { 
+                  const targetDateStr = new Date(goal.targetDate).toLocaleDateString();
+                  const query = `I have ₹${goal.currentAmount} saved for my '${goal.title}' goal by ${targetDateStr}. Stocrates, give me an exact Liquid Mutual Fund or Arbitrage fund allocation strategy in India to protect this capital from inflation.`;
+                  window.history.pushState({}, '', `/?tab=analytics&q=${encodeURIComponent(query)}`);
+                  window.dispatchEvent(new CustomEvent('navigate', { detail: 'analytics' }));
+                }}>View Allocation Strategy</span>.
+              </span>
+            )}
           </div>
         </div>
 

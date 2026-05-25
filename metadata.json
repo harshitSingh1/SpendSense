@@ -2,5 +2,5 @@
   "name": "SpendSense AI",
   "description": "Smart financial tracking and intelligence with a calm, minimal interface.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -27,9 +27,9 @@ import { Button } from "@/components/ui/button";
 export default function DashboardView() {
   const currency = useCurrency();
   const [session, setSession] = useState<any>(null);
-  const [metrics, setMetrics] = useState<any>(null);
+  const [rawMetrics, setRawMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<'monthly' | 'yearly' | 'all'>('yearly');
+  const [timeRange, setTimeRange] = useState<'monthly' | 'yearly' | 'all'>('monthly');
 
   useEffect(() => {
     const init = async () => {
@@ -46,9 +46,9 @@ export default function DashboardView() {
           console.warn("Could not fetch session, proceeding to metrics fetch:", sessionErr);
         }
 
-        // Fetch metrics
-        const metricsData = await getDashboardMetrics(timeRange);
-        setMetrics(metricsData);
+        // Fetch metrics once for 'all' time
+        const metricsData = await getDashboardMetrics('all');
+        setRawMetrics(metricsData);
       } catch (error) {
         console.error("Dashboard init failed:", error);
       } finally {
@@ -56,7 +56,77 @@ export default function DashboardView() {
       }
     };
     init();
-  }, [timeRange]);
+  }, []); // Run only once on mount
+
+  const metrics = React.useMemo(() => {
+    if (!rawMetrics) return null;
+    if (timeRange === 'all') return rawMetrics;
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const filteredTransactions = (rawMetrics.monthlyTransactions || []).filter((t: any) => {
+      const d = new Date(t.date);
+      if (timeRange === 'monthly') {
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      }
+      if (timeRange === 'yearly') {
+        return d.getFullYear() === currentYear;
+      }
+      return true;
+    });
+
+    const filteredCashflow = (rawMetrics.dailyCashflow || []).filter((c: any) => {
+      const d = new Date(c.date);
+      if (timeRange === 'monthly') {
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      }
+      if (timeRange === 'yearly') {
+        return d.getFullYear() === currentYear;
+      }
+      return true;
+    });
+
+    let totalIncome = 0;
+    let totalExpenses = 0;
+    const catMap: Record<string, number> = {};
+
+    filteredTransactions.forEach((t: any) => {
+      if (t.type === 'income') {
+        totalIncome += t.amount;
+      } else if (t.type === 'expense') {
+        totalExpenses += t.amount;
+        catMap[t.category] = (catMap[t.category] || 0) + t.amount;
+      }
+    });
+
+    const categoryAllocation = Object.entries(catMap)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+
+    const currentBalance = totalIncome - totalExpenses;
+
+    let healthScore = 50; 
+    if (totalIncome === 0 && totalExpenses > 0) {
+      healthScore = 10;
+    } else if (totalIncome > 0) {
+      const savingsRate = ((totalIncome - totalExpenses) / totalIncome) * 100;
+      healthScore = Math.min(Math.max(60 + savingsRate, 0), 100);
+    }
+    healthScore = Math.round(healthScore);
+
+    return {
+      ...rawMetrics,
+      totalIncome,
+      totalExpenses,
+      currentBalance,
+      healthScore,
+      categoryAllocation,
+      monthlyTransactions: filteredTransactions,
+      dailyCashflow: filteredCashflow
+    };
+  }, [rawMetrics, timeRange]);
 
   if (loading && !metrics) {
     return (
