@@ -174,7 +174,7 @@ async function startServer() {
       
       if (!secret || authHeader !== `Bearer ${secret}`) {
         console.warn('⚠️ Unauthorized CRON attempt');
-        return res.status(401).json({ error: "Unauthorized. Secure CRON secret required." });
+        return res.status(401).json({ error: "Unauthorized" });
       }
 
       await dbConnect();
@@ -203,10 +203,10 @@ async function startServer() {
       }
 
       console.log(`✅ Monthly Digest CRON completed. Users processed: ${count}`);
-      res.json({ status: 'ok', usersProcessed: count });
-    } catch (error) {
+      return res.status(200).json({ success: true, processed: count });
+    } catch (error: any) {
       console.error('❌ Monthly Digest CRON Failed:', error);
-      res.status(500).json({ error: (error as Error).message });
+      return res.status(500).json({ error: error.message });
     }
   });
 
@@ -218,7 +218,7 @@ async function startServer() {
       
       if (!secret || authHeader !== `Bearer ${secret}`) {
         console.warn('⚠️ Unauthorized CRON attempt (Market Brief)');
-        return res.status(401).json({ error: "Unauthorized CRON execution." });
+        return res.status(401).json({ error: "Unauthorized" });
       }
 
       let aiInsight = "The market rewards patience and consistent strategy over time.";
@@ -262,10 +262,10 @@ async function startServer() {
       }
 
       console.log(`✅ Daily Market Brief sent to ${proUsers.length} Pro users.`);
-      res.json({ success: true, count: proUsers.length, insight: aiInsight });
+      return res.status(200).json({ success: true, processed: proUsers.length });
     } catch (error: any) {
       console.error('❌ Daily Market Brief CRON Failed:', error);
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
     }
   });
 
