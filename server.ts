@@ -206,7 +206,7 @@ async function startServer() {
       return res.status(200).json({ success: true, processed: count });
     } catch (error: any) {
       console.error('❌ Monthly Digest CRON Failed:', error);
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message || 'Internal Server Error' });
     }
   });
 
@@ -265,7 +265,7 @@ async function startServer() {
       return res.status(200).json({ success: true, processed: proUsers.length });
     } catch (error: any) {
       console.error('❌ Daily Market Brief CRON Failed:', error);
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message || 'Internal Server Error' });
     }
   });
 
