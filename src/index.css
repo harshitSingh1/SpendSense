@@ -147,3 +147,17 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground);
 }
+
+/* Driver.js Custom Theme */
+.spendsense-tour-theme {
+  --driver-popover-bg: var(--card);
+  --driver-popover-text-color: var(--foreground);
+  --driver-btn-bg: var(--primary);
+  --driver-btn-text-color: var(--primary-foreground);
+  --driver-btn-border-color: var(--primary);
+  --driver-close-color: var(--muted-foreground);
+  --driver-text-color: var(--foreground);
+  --driver-title-color: var(--foreground);
+  --driver-arrow-color: var(--card);
+  border: 1px solid var(--border);
+}

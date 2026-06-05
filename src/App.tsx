@@ -637,17 +637,19 @@ export default function App() {
               <div className="text-slate-600 dark:text-slate-400 font-medium text-sm">
                   {getGreeting()}, {user?.name ? user.name.split(" ")[0] : "User"} <span className="mx-2 text-slate-300 dark:text-zinc-700">•</span> <span className="capitalize">{activeTab}</span>
               </div>
-              <div className="flex bg-slate-50 dark:bg-slate-900 p-1.5 rounded-full border border-slate-200 dark:border-white/10 shadow-sm">
-                 {['monthly', 'yearly', 'all'].map((t) => (
-                   <button
-                     key={t}
-                     onClick={() => setTimeRange(t as 'monthly' | 'yearly' | 'all')}
-                     className={`px-4 md:px-6 py-2 text-sm font-bold rounded-full capitalize transition-all ${timeRange === t ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-white/5' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
-                   >
-                     {t === 'all' ? 'All Time' : t}
-                   </button>
-                 ))}
-              </div>
+              {activeTab === 'dashboard' && (
+                <div className="flex bg-slate-50 dark:bg-slate-900 p-1.5 rounded-full border border-slate-200 dark:border-white/10 shadow-sm">
+                   {['monthly', 'yearly', 'all'].map((t) => (
+                     <button
+                       key={t}
+                       onClick={() => setTimeRange(t as 'monthly' | 'yearly' | 'all')}
+                       className={`px-4 md:px-6 py-2 text-sm font-bold rounded-full capitalize transition-all ${timeRange === t ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-white/5' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                     >
+                       {t === 'all' ? 'All Time' : t}
+                     </button>
+                   ))}
+                </div>
+              )}
             </div>
           )}
 

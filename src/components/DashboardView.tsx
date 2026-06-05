@@ -30,7 +30,7 @@ import { getGoals, GoalData } from "../services/goalService";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import DashboardTour from "./DashboardTour";
+import DashboardTour from "./dashboard/DashboardTour";
 
 export default function DashboardView({ timeRange }: { timeRange?: 'monthly' | 'yearly' | 'all' }) {
   const currency = useCurrency();
@@ -106,7 +106,7 @@ export default function DashboardView({ timeRange }: { timeRange?: 'monthly' | '
       <DashboardTour />
       
       {/* TIER 1: The Pulse (Top Row) */}
-      <section>
+      <section id="tier-1-pulse">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard 
             title="Income"
@@ -146,7 +146,7 @@ export default function DashboardView({ timeRange }: { timeRange?: 'monthly' | '
               <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mt-1">Transaction Pulse & Memos</p>
             </CardHeader>
             <CardContent className="h-auto xl:min-h-[450px] p-6 flex flex-col overflow-x-auto">
-               <div className="flex-1 min-w-[300px]">
+               <div id="financial-calendar" className="flex-1 min-w-[300px]">
                 <FinancialCalendar 
                   dailyCashflow={metrics?.dailyCashflow || []} 
                   calendarNotes={metrics?.calendarNotes || {}} 
@@ -204,7 +204,7 @@ export default function DashboardView({ timeRange }: { timeRange?: 'monthly' | '
             <p className="text-slate-500 dark:text-slate-400 font-medium">Quick access to core operational zones</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div id="tier-2-actions" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             
             <button 
               onClick={() => dispatchNavigation('history')}
