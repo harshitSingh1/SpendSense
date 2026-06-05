@@ -67,6 +67,7 @@ import { Logo } from './components/ui/Logo';
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [timeRange, setTimeRange] = useState<'monthly' | 'yearly' | 'all'>('monthly');
   const [appView, setAppView] = useState<"landing" | "auth" | "dashboard" | "terms" | "privacy" | "contact" | "reset-password" | "new-password" | "admin" | "checkout" | "not-found">(
     window.location.pathname === "/auth/new-password" ? "new-password" : 
     window.location.pathname === "/admin" ? "admin" : 
@@ -366,7 +367,6 @@ export default function App() {
                      <NavItem active={activeTab === "goals"} onClick={() => { setActiveTab("goals"); }} icon={<PiggyBank className="h-4 w-4" />} label="Piggy Banks" />
                      <NavItem active={activeTab === "wealth"} onClick={() => { setActiveTab("wealth"); }} icon={<Coins className="h-4 w-4" />} label="Wealth Engine" />
                      <NavItem active={activeTab === "shield"} onClick={() => { setActiveTab("shield"); }} icon={<ShieldCheck className="h-4 w-4" />} label="Protection" />
-                     <NavItem active={activeTab === "tax"} onClick={() => { setActiveTab("tax"); }} icon={<Calculator className="h-4 w-4" />} label="Tax Optimizer" />
                      <NavItem active={activeTab === "arsenal"} onClick={() => { setActiveTab("arsenal"); }} icon={<BookOpen className="h-4 w-4" />} label="The Arsenal" />
                   </div>
 
@@ -557,13 +557,6 @@ export default function App() {
               isCollapsed={isSidebarCollapsed}
             />
             <NavItem 
-              active={activeTab === "tax"} 
-              onClick={() => setActiveTab("tax")} 
-              icon={<Calculator className="h-4 w-4" />} 
-              label="Tax Optimizer" 
-              isCollapsed={isSidebarCollapsed}
-            />
-            <NavItem 
               active={activeTab === "arsenal"} 
               onClick={() => setActiveTab("arsenal")} 
               icon={<BookOpen className="h-4 w-4" />} 
@@ -644,6 +637,17 @@ export default function App() {
               <div className="text-slate-600 dark:text-slate-400 font-medium text-sm">
                   {getGreeting()}, {user?.name ? user.name.split(" ")[0] : "User"} <span className="mx-2 text-slate-300 dark:text-zinc-700">•</span> <span className="capitalize">{activeTab}</span>
               </div>
+              <div className="flex bg-slate-50 dark:bg-slate-900 p-1.5 rounded-full border border-slate-200 dark:border-white/10 shadow-sm">
+                 {['monthly', 'yearly', 'all'].map((t) => (
+                   <button
+                     key={t}
+                     onClick={() => setTimeRange(t as 'monthly' | 'yearly' | 'all')}
+                     className={`px-4 md:px-6 py-2 text-sm font-bold rounded-full capitalize transition-all ${timeRange === t ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-white/5' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                   >
+                     {t === 'all' ? 'All Time' : t}
+                   </button>
+                 ))}
+              </div>
             </div>
           )}
 
@@ -651,7 +655,7 @@ export default function App() {
             {activeTab === "settings" ? (
               <ProfileView user={user} onSignOut={handleSignOut} />
             ) : activeTab === "dashboard" ? (
-              <div><DashboardView /></div>
+              <div><DashboardView timeRange={timeRange} /></div>
             ) : activeTab === "wealth" ? (
               <div><InvestView user={user} setActiveTab={setActiveTab} /></div>
             ) : activeTab === "shield" ? (

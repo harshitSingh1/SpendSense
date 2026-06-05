@@ -22,12 +22,12 @@ export default function CashflowTrendChart({ data }: CashflowTrendChartProps) {
 
   if (isEmpty) {
     return (
-      <div className="flex flex-col items-center justify-center h-full w-full text-center p-6 bg-muted/20 rounded-3xl border border-dashed border-border">
+      <div className="flex flex-col items-center justify-center h-full w-full text-center p-6 bg-slate-50 border border-dashed border-slate-200 rounded-3xl">
         <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4 text-muted-foreground/30">
           <Activity className="h-6 w-6" />
         </div>
-        <p className="text-sm font-medium text-muted-foreground">No cashflow data available yet.</p>
-        <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/40 mt-1">Track income & expenses to view trends</p>
+        <p className="text-sm font-medium text-muted-foreground">Add cashflows to track activity.</p>
+        <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/40 mt-1">Click + Log New Transaction to get started.</p>
       </div>
     );
   }
@@ -118,18 +118,18 @@ export default function CashflowTrendChart({ data }: CashflowTrendChartProps) {
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card/95 backdrop-blur-md border border-border/50 p-3 rounded-2xl shadow-xl min-w-[120px]">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 mb-2">
+      <div className="bg-white border border-slate-200 p-3 rounded-2xl shadow-xl min-w-[120px]">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 opacity-80 mb-2">
           {label}
         </p>
         <div className="space-y-1.5">
           {payload.map((entry: any, index: number) => (
-             <div key={index} className="flex items-center justify-between gap-4">
+             <div key={index} className="flex items-center justify-between gap-4 text-slate-500">
                 <span className="text-xs font-semibold capitalize flex items-center gap-1.5">
                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
                    {entry.name}
                 </span>
-                <span className="text-sm font-mono font-black tracking-tighter text-foreground">
+                <span className="text-sm font-mono font-black tracking-tighter text-slate-900">
                   ₹{(entry.value ?? 0).toLocaleString()}
                 </span>
              </div>

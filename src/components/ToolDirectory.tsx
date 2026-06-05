@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ThumbsUp, ThumbsDown, Plane, ShoppingCart, Coins, Sparkles, ExternalLink, ChevronUp, ChevronDown, ArrowRight, ArrowLeft, CheckCircle2, XCircle, ArrowBigUp, ArrowBigDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Plane, ShoppingCart, Coins, Sparkles, ExternalLink, ChevronUp, ChevronDown, ArrowRight, ArrowLeft, CheckCircle2, XCircle, ArrowBigUp, ArrowBigDown, BrainCircuit } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "motion/react";
@@ -97,7 +97,7 @@ function ToolVoter({ toolId, initialUpvotes, initialVote, onSync }: { toolId: st
     if (vote === null) {
       toast.success('+10 Financial IQ', {
         description: `You earned points for reviewing "${toolId}".`,
-        icon: '🧠'
+        icon: <BrainCircuit className="h-4 w-4" />
       });
     }
 
@@ -217,6 +217,9 @@ export default function ToolDirectory({ onToolRated }: { onToolRated?: () => voi
               Select an arbitrage discipline
             </span>
           </div>
+          <p className="text-slate-400 text-sm md:text-base max-w-2xl mt-2 mb-8 px-2">
+            Deploy real-world arbitrage. Bypass pricing algorithms, stack hidden rewards, and systematically lower your daily living expenses using these community-sourced exploits.
+          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {CATEGORY_META.map((cat, idx) => (

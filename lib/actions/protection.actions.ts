@@ -42,13 +42,13 @@ export async function getProtectionMetrics(req: Request) {
   const currentSavings = Math.max(totals.income - totals.expense, 0);
 
   // 4. Insurance Detection
-  // We scan all-time transactions for any entry with the 'Insurance' category
-  const insuranceTransaction = await Transaction.findOne({
+  // We scan all-time transactions for any entry with 'Insurance' or 'Medical Premium'
+  const insurancePaymentsCount = await Transaction.countDocuments({
     userId,
-    category: { $regex: /insurance/i }
+    category: { $regex: /insurance|medical premium/i }
   });
 
-  const hasActiveInsurance = !!insuranceTransaction;
+  const hasActiveInsurance = insurancePaymentsCount > 0;
 
   // 5. Calculate Protection Score (0-100)
   // 60% Weight: Emergency Fund Coverage (up to target)
@@ -68,6 +68,7 @@ export async function getProtectionMetrics(req: Request) {
     targetEmergencyFund: Math.round(targetEmergencyFund),
     currentSavings: Math.round(currentSavings),
     hasActiveInsurance,
+    insurancePaymentsCount,
     protectionScore
   };
 }

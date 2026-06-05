@@ -24,15 +24,15 @@ export default function RecentActivityWidget({ transactions }: RecentActivityWid
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto pr-2 space-y-2 min-h-0">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-muted/20 rounded-2xl border border-dashed border-border/50">
+          <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-slate-50 border border-dashed border-slate-200 text-slate-500 rounded-2xl">
             <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-3 text-primary">
               <Clock className="h-5 w-5 opacity-50" />
             </div>
-            <p className="text-sm font-bold text-muted-foreground">No recent activity.</p>
+            <p className="text-sm font-bold">Add data to track activity.</p>
           </div>
         ) : (
           latestTransactions.map((tx) => (
-            <div key={tx._id} className="flex items-center justify-between p-2.5 px-3 rounded-2xl bg-white/40 dark:bg-black/20 border border-border/50 shadow-sm">
+            <div key={tx._id} className="flex items-center justify-between p-2.5 px-3 rounded-2xl bg-white border border-slate-100 shadow-sm">
               <div className="flex items-center gap-3 overflow-hidden">
                 <div className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
                   {tx.type === 'income' ? <ArrowUpRight className="h-5 w-5" /> : <ArrowDownRight className="h-5 w-5" />}

@@ -197,5 +197,52 @@ export const ACADEMY_QUIZZES: Record<string, QuizQuestion[]> = {
       ],
       rationale: "Automation removes willpower from the equation. Pay your future self before the capital touches your spending accounts."
     }
+  ],
+  "tax-optimization": [
+    {
+      text: "What is the difference between Gross and Net income?",
+      options: [
+        { text: "Gross is what you keep, Net is what you make.", isCorrect: false },
+        { text: "Gross is what you make, Net is what you keep after taxes.", isCorrect: true },
+        { text: "They are exactly the same thing.", isCorrect: false }
+      ],
+      rationale: "Gross income is your total earnings before any taxes or deductions. Net income is your actual take-home pay."
+    },
+    {
+      text: "What is a tax deduction?",
+      options: [
+        { text: "A penalty for paying late.", isCorrect: false },
+        { text: "An extra fee added to your bill.", isCorrect: false },
+        { text: "A discount coupon that lowers the money the government looks at.", isCorrect: true }
+      ],
+      rationale: "Deductions reduce your taxable income, meaning you are taxed on a smaller amount."
+    },
+    {
+      text: "If you get a raise and move into a higher tax bracket, does all your money get taxed at the higher rate?",
+      options: [
+        { text: "Yes, all your money gets taxed higher.", isCorrect: false },
+        { text: "No, only the money in that specific bucket gets taxed higher.", isCorrect: true },
+        { text: "It depends on your job.", isCorrect: false }
+      ],
+      rationale: "Tax systems are progressive. You only pay the higher rate on the money that spills into that specific higher bracket."
+    },
+    {
+      text: "Why is it important to use government-approved retirement accounts?",
+      options: [
+        { text: "They often act as a massive discount coupon on your current taxes.", isCorrect: true },
+        { text: "They let you withdraw money anytime without rules.", isCorrect: false },
+        { text: "They guarantee that you will become a millionaire.", isCorrect: false }
+      ],
+      rationale: "Governments incentivize saving for retirement by offering significant tax deductions or tax-free growth."
+    },
+    {
+      text: "What is the main goal of tax optimization?",
+      options: [
+        { text: "To avoid paying any taxes illegally.", isCorrect: false },
+        { text: "To pay more money to the government than you need to.", isCorrect: false },
+        { text: "To legally minimize your taxes so you keep more of your own money.", isCorrect: true }
+      ],
+      rationale: "Tax evasion is illegal, but tax optimization uses perfectly legal structures and rules to protect your wealth."
+    }
   ]
 };

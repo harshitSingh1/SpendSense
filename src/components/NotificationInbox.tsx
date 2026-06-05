@@ -49,33 +49,41 @@ export default function NotificationInbox({ isOpen, onClose, onUnreadCountChange
 
   const fetchNotifications = async () => {
     try {
-      // Don't fetch if tab is hidden or whatever, but for now just add robustness
       const res = await fetch("/api/notifications", {
-        credentials: "include" // Explicitly ensure cookies are sent
+        headers: { "Accept": "application/json" },
+        credentials: "include"
       });
       
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        // Failing silently on non-JSON response since this happens during server restart / HMR
+        return;
+      }
+      
       if (res.ok) {
-        const data = await res.json();
-        const mapped = data.map((n: any) => ({
-          id: n._id,
-          title: n.title,
-          description: n.message,
-          time: n.createdAt ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true }) : 'just now',
-          icon: getIconForType(n.type),
-          isRead: n.isRead,
-          type: n.type
-        }));
-        setNotifications(mapped);
-        
-        const unreadCount = mapped.filter((n: any) => !n.isRead).length;
-        onUnreadCountChange?.(unreadCount);
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          const mapped = data.map((n: any) => ({
+            id: n._id,
+            title: n.title,
+            description: n.message,
+            time: n.createdAt ? formatDistanceToNow(new Date(n.createdAt), { addSuffix: true }) : 'just now',
+            icon: getIconForType(n.type),
+            isRead: n.isRead,
+            type: n.type
+          }));
+          setNotifications(mapped);
+          
+          const unreadCount = mapped.filter((n: any) => !n.isRead).length;
+          onUnreadCountChange?.(unreadCount);
+        } catch (parseError: any) {
+          console.error("Failed to parse notifications JSON.");
+        }
       } else {
-        const errorData = await res.json().catch(() => ({}));
-        console.warn("Notification fetch not ok:", res.status, errorData);
+        // Silently ignore non-200 to avoid console spam during auto-polling
       }
     } catch (e: any) {
-      console.error("Failed to fetch notifications:", e.name, e.message);
-      // Only log broadly if it's not a common "Failed to fetch" which can happen on refresh
       if (e.name !== 'TypeError') {
         console.error("Detailed notification error:", e);
       }

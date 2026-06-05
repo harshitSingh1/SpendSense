@@ -112,7 +112,7 @@ export default function AdminPanel({ user, onBack }: { user: any, onBack: () => 
 
   const handleBroadcast = async (e: React.FormEvent) => {
     e.preventDefault(); // STOP THE PAGE FROM REFRESHING
-    console.log('🚀 BROADCAST INITIATED: Button clicked.');
+    console.log('[BROADCAST INITIATED]: Button clicked.');
 
     if (!broadcastTitle || !broadcastMessage) {
       toast.error("Tile and Message are required");
@@ -148,7 +148,7 @@ export default function AdminPanel({ user, onBack }: { user: any, onBack: () => 
         setBroadcastMessage('');
       }
     } catch (err: any) {
-      console.error('🔥 CRITICAL CATCH:', err);
+      console.error('[CRITICAL ERROR]:', err);
       setStatusMessage('❌ System Error: ' + (err.message || 'Check console'));
       toast.error("Internal system error occurred");
     } finally {
@@ -361,7 +361,7 @@ export default function AdminPanel({ user, onBack }: { user: any, onBack: () => 
                       required 
                       value={broadcastTitle} 
                       onChange={e => setBroadcastTitle(e.target.value)} 
-                      placeholder="e.g. 🎉 New Feature: Budget Planner" 
+                      placeholder="e.g. New Feature: Budget Planner"
                       className="bg-slate-950 border-slate-800 text-white" 
                     />
                   </div>
@@ -383,10 +383,10 @@ export default function AdminPanel({ user, onBack }: { user: any, onBack: () => 
                         onChange={e => setBroadcastType(e.target.value as any)}
                         className="w-full h-10 rounded-md bg-slate-950 border border-slate-800 px-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
                       >
-                        <option value="global">📢 Global Announcement</option>
-                        <option value="system">🤖 System Update</option>
-                        <option value="gamification">🏆 Challenge/Achievement</option>
-                        <option value="billing">💰 Billing/Subscription</option>
+                        <option value="global">Global Announcement</option>
+                        <option value="system">System Update</option>
+                        <option value="gamification">Challenge/Achievement</option>
+                        <option value="billing">Billing/Subscription</option>
                       </select>
                     </div>
                   </div>

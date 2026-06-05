@@ -18,7 +18,10 @@ import {
   TrendingUp,
   Shield,
   PieChart,
-  Sword
+  Sword,
+  BrainCircuit,
+  Wrench,
+  Calculator
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +34,8 @@ import InflationErosion from "./InflationErosion";
 import InsuranceGap from "./InsuranceGap";
 import CompoundVisualizer from "./CompoundVisualizer";
 import ToolDirectory from "./ToolDirectory";
+import TaxOptimizationCourse from "../app/arsenal/academy/tax-optimization/page";
+
 
 const ProgressRing = ({ progress, locked }: { progress: number, locked?: boolean }) => {
   const radius = 24;
@@ -101,6 +106,7 @@ export default function ArsenalView() {
   const recommendationSlug = "the-50-30-20-rule-explained";
 
   const modules = [
+    { slug: "tax-optimization", title: "Taxes: The Wealth Accelerator", category: "Tax Optimization", locked: false, icon: <Calculator className="h-5 w-5" />, duration: "10 min" },
     { slug: "why-inflation-is-stealing-your-money", title: "The Silent Thief: Defeating Inflation", category: "Economics", locked: false, icon: <TrendingUp className="h-5 w-5" />, duration: "8 min" },
     { slug: "term-life-vs-health-insurance", title: "The Armor: Advanced Liability Protection", category: "Risk Management", locked: false, icon: <Shield className="h-5 w-5" />, duration: "12 min" },
     { slug: "index-funds-guaranteed-way-to-wealth", title: "The Engine: Index Fund Mastery", category: "Investing", locked: completedModules.length < 2, icon: <PieChart className="h-5 w-5" />, duration: "15 min" }
@@ -148,15 +154,15 @@ export default function ArsenalView() {
               <div className="backdrop-blur-xl bg-slate-900/90 border border-white/20 p-1.5 rounded-full grid grid-cols-2 gap-1 shadow-2xl">
                 <button 
                   onClick={() => setActiveTab('core')}
-                  className={`text-lg font-semibold py-3 rounded-full transition-all duration-300 ${activeTab === 'core' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                  className={`flex items-center justify-center gap-2 text-lg font-semibold py-3 rounded-full transition-all duration-300 ${activeTab === 'core' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                 >
-                  🧠 Core Intelligence
+                  <BrainCircuit className="w-5 h-5 shrink-0" /> Core Intelligence
                 </button>
                 <button 
                   onClick={() => setActiveTab('tools')}
-                  className={`text-lg font-semibold py-3 rounded-full transition-all duration-300 ${activeTab === 'tools' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                  className={`flex items-center justify-center gap-2 text-lg font-semibold py-3 rounded-full transition-all duration-300 ${activeTab === 'tools' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                 >
-                  🛠️ Tactical Tools
+                  <Wrench className="w-5 h-5 shrink-0" /> Tactical Tools
                 </button>
               </div>
             </div>
@@ -254,6 +260,8 @@ export default function ArsenalView() {
               </div>
             )}
           </motion.div>
+        ) : selectedSlug === "tax-optimization" ? (
+          <TaxOptimizationCourse key="tax" onBack={() => setSelectedSlug(null)} onComplete={() => fetchProgress()} />
         ) : (
           <motion.article 
             key="article"

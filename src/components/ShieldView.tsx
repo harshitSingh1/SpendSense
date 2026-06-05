@@ -54,14 +54,30 @@ export default function ShieldView({ user, setActiveTab }: { user?: any, setActi
     );
   }
 
-  const averageMonthlyExpenses = metrics?.averageMonthlyExpense || 11566; // Fallback data
-  const currentBalance = metrics?.currentSavings || 87802;
-  const targetEmergencyFund = metrics?.targetEmergencyFund || (averageMonthlyExpenses * 6);
-  const dailyBurnRate = averageMonthlyExpenses / 30;
-  const runwayDays = dailyBurnRate > 0 ? Math.floor(currentBalance / dailyBurnRate) : 0;
+  const monthlyExpenses = metrics?.averageMonthlyExpense || 0;
+  const currentBalance = metrics?.currentSavings || 0;
+  const targetEmergencyFund = monthlyExpenses > 0 ? monthlyExpenses * 6 : 0;
+  const dailyBurnRate = monthlyExpenses > 0 ? monthlyExpenses / 30 : 0;
   
+  let runwayDaysDisplay = "0 Days";
+  let runwayScoreValue = 0;
+
+  if (monthlyExpenses <= 0) {
+    if (currentBalance > 0) {
+      runwayDaysDisplay = "Infinite (Needs Expense Data)";
+      runwayScoreValue = 100;
+    } else {
+      runwayDaysDisplay = "0 Days";
+      runwayScoreValue = 0;
+    }
+  } else {
+    const days = Math.floor(currentBalance / dailyBurnRate);
+    runwayDaysDisplay = `${days} Days`;
+    runwayScoreValue = Math.min(Math.round((days / 180) * 100), 100);
+  }
+
   // Calculate resilience score
-  const resilienceScore = metrics?.protectionScore ?? Math.min(Math.round((runwayDays / 180) * 100), 100);
+  const resilienceScore = metrics?.protectionScore ?? runwayScoreValue;
 
   const radialData = [
     {
@@ -71,8 +87,11 @@ export default function ShieldView({ user, setActiveTab }: { user?: any, setActi
     }
   ];
 
-  const emergencyPercentage = targetEmergencyFund > 0 ? Math.min(Math.round((currentBalance / targetEmergencyFund) * 100), 100) : 100;
-  const isFullyShielded = currentBalance >= targetEmergencyFund;
+  const emergencyPercentage = targetEmergencyFund > 0 ? Math.min(Math.round((currentBalance / targetEmergencyFund) * 100), 100) : (monthlyExpenses <= 0 ? 0 : 100);
+  const isFullyShielded = targetEmergencyFund > 0 && currentBalance >= targetEmergencyFund;
+  
+  const insurancePaymentsCount = metrics?.insurancePaymentsCount || 0;
+  const isMedicalShielded = insurancePaymentsCount > 0;
 
 
   return (
@@ -83,7 +102,7 @@ export default function ShieldView({ user, setActiveTab }: { user?: any, setActi
           
           <div className="flex-1 space-y-3 sm:space-y-4 text-center md:text-left">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-              Financial Runway: {runwayDays} Days
+              Financial Runway: {runwayDaysDisplay}
             </h2>
             <p className="text-sm sm:text-lg text-slate-500 dark:text-slate-400 font-medium">
               If your income stopped today, this is exactly how long you survive.
@@ -142,56 +161,72 @@ export default function ShieldView({ user, setActiveTab }: { user?: any, setActi
             <CardTitle className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">Emergency Buffer</CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-            <div className="space-y-2 sm:space-y-3">
-              <p className="text-sm sm:text-base font-bold font-mono tracking-tight text-slate-900 dark:text-white truncate">
-                Current: {formatMoney(currentBalance, userRegion)} <span className="opacity-40">/</span> Target: {formatMoney(targetEmergencyFund, userRegion)}
+            {monthlyExpenses <= 0 ? (
+              <p className="flex items-center text-sm font-medium text-amber-600 dark:text-amber-500 bg-amber-500/10 px-4 py-3 rounded-xl border border-amber-500/20">
+                <AlertTriangle className="w-4 h-4 mr-2 shrink-0" /> Add your monthly expenses in the Omni-Tracker to calculate your target buffer.
               </p>
-              <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
-                (6 Months) living expenses liquidity.
-              </p>
-            </div>
-            
-            <div className="h-2.5 sm:h-3 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-               <motion.div 
-                 initial={{ width: 0 }}
-                 animate={{ width: `${emergencyPercentage}%` }}
-                 transition={{ duration: 1.5, ease: "easeOut" }}
-                 className={`h-full ${isFullyShielded ? 'bg-emerald-500' : 'bg-amber-500'}`}
-               />
-            </div>
+            ) : (
+              <>
+                <div className="space-y-2 sm:space-y-3">
+                  <p className="text-sm sm:text-base font-bold font-mono tracking-tight text-slate-900 dark:text-white truncate">
+                    Current: {formatMoney(currentBalance, userRegion)} <span className="opacity-40">/</span> Target: {formatMoney(targetEmergencyFund, userRegion)}
+                  </p>
+                  <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
+                    (6 Months) living expenses liquidity.
+                  </p>
+                </div>
+                
+                <div className="h-2.5 sm:h-3 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                   <motion.div 
+                     initial={{ width: 0 }}
+                     animate={{ width: `${emergencyPercentage}%` }}
+                     transition={{ duration: 1.5, ease: "easeOut" }}
+                     className={`h-full ${isFullyShielded ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                   />
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
         {/* Shield 2 (Medical Armor) */}
-        <Card className="border border-amber-500/30 dark:border-amber-500/20 shadow-md shadow-amber-500/5 rounded-2xl sm:rounded-[2rem] bg-amber-50/30 dark:bg-zinc-900 overflow-hidden transition-all duration-500 flex flex-col justify-between">
+        <Card className={`border shadow-md rounded-2xl sm:rounded-[2rem] overflow-hidden transition-all duration-500 flex flex-col justify-between ${isMedicalShielded ? 'border-emerald-500/30 dark:border-emerald-500/20 shadow-emerald-500/5 bg-emerald-50/30 dark:bg-zinc-900' : 'border-amber-500/30 dark:border-amber-500/20 shadow-amber-500/5 bg-amber-50/30 dark:bg-zinc-900'}`}>
           <div>
             <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl flex items-center justify-center transition-transform hover:scale-110 bg-amber-500/10 text-amber-600 shadow-lg shadow-amber-500/10 relative shrink-0">
-                  <div className="absolute inset-0 bg-amber-500/20 animate-ping rounded-xl sm:rounded-2xl" />
+                <div className={`h-10 w-10 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl flex items-center justify-center transition-transform hover:scale-110 shadow-lg relative shrink-0 ${isMedicalShielded ? 'bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10' : 'bg-amber-500/10 text-amber-600 shadow-amber-500/10'}`}>
+                  {!isMedicalShielded && <div className="absolute inset-0 bg-amber-500/20 animate-ping rounded-xl sm:rounded-2xl" />}
                   <HeartPulse className="h-5 w-5 sm:h-6 sm:w-6 relative z-10" />
                 </div>
-                <div className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-amber-500/10 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                  <AlertTriangle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 animate-pulse" />
-                  <span className="text-[8px] sm:text-[10px] font-black uppercase text-amber-600 tracking-widest">Vulnerable</span>
+                <div className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border ${isMedicalShielded ? 'bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.3)]'}`}>
+                  {isMedicalShielded ? (
+                    <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-600 animate-pulse" />
+                  ) : (
+                    <AlertTriangle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600 animate-pulse" />
+                  )}
+                  <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${isMedicalShielded ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    {isMedicalShielded ? 'Shielded' : 'Vulnerable'}
+                  </span>
                 </div>
               </div>
               <CardTitle className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">Medical Armor</CardTitle>
-              <CardDescription className="text-xs sm:text-sm font-medium text-amber-700/80 dark:text-amber-400 mt-1 sm:mt-2">
-                0 Premium Payments Detected.
+              <CardDescription className={`text-xs sm:text-sm font-medium mt-1 sm:mt-2 ${isMedicalShielded ? 'text-emerald-700/80 dark:text-emerald-400' : 'text-amber-700/80 dark:text-amber-400'}`}>
+                {insurancePaymentsCount} Premium Payment{insurancePaymentsCount !== 1 ? 's' : ''} Detected.
               </CardDescription>
             </CardHeader>
           </div>
-          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-2">
-            <a href="https://joinditto.in/" target="_blank" rel="noopener noreferrer" className="block w-full">
-              <Button 
-                className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20 transition-all font-sans"
-              >
-                Patch Vulnerability
-                <ArrowUpRight className="h-4 w-4 ml-2" />
-              </Button>
-            </a>
-          </CardContent>
+          {!isMedicalShielded && (
+            <CardContent className="p-4 sm:p-6 pt-0 sm:pt-2">
+              <a href="https://joinditto.in/" target="_blank" rel="noopener noreferrer" className="block w-full">
+                <Button 
+                  className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20 transition-all font-sans"
+                >
+                  + Audit Existing Policy
+                  <ArrowUpRight className="h-4 w-4 ml-2" />
+                </Button>
+              </a>
+            </CardContent>
+          )}
         </Card>
       </div>
 

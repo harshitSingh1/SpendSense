@@ -880,6 +880,400 @@ Policy Text: ${policyText}`;
   });
 
   // 4.4 Arsenal API Routes
+  app.get("/api/academy/tax-course", async (req, res) => {
+    try {
+      const xForwardedFor = req.headers['x-forwarded-for'];
+      const xRealIp = req.headers['x-real-ip'];
+      const vercelCountry = req.headers['x-vercel-ip-country'];
+      
+      let countryCode = String(vercelCountry || '').toUpperCase();
+      
+      if (!countryCode) {
+        if (process.env.NODE_ENV !== 'production') {
+          countryCode = 'IN';
+        } else {
+          countryCode = 'GLOBAL';
+        }
+      }
+
+      console.log(`[Tax Course API] Detected IP Country Code: ${countryCode}`);
+
+      let country = 'Global';
+      if (countryCode === 'IN') country = 'India';
+      else if (countryCode === 'US') country = 'US';
+      else if (countryCode === 'GB' || countryCode === 'UK') country = 'UK';
+      else if (countryCode === 'CH') country = 'Switzerland';
+
+      const regions: Record<string, any> = {
+        'India': {
+          title: "Taxes: The Wealth Accelerator",
+          readTime: "10 min",
+          category: "Tax Optimization",
+          sections: [
+            { type: "header", level: 2, text: "How Taxes Work" },
+            { type: "paragraph", text: "Taxes are the money you pay to the government to keep the country running. Gross income is all the money you make. Net income is the money you actually get to keep after taxes. Maximizing the money you keep is how you build wealth faster." },
+            { type: "header", level: 2, text: "The Regional Breakdown: India" },
+            { type: "paragraph", text: "In India, tax works like filling up buckets with water. As you earn more, your money spills into bigger buckets called tax brackets. A tax deduction is like a discount coupon that lowers the amount of money the government is allowed to look at. Under the Old Regime, you get discount coupons for things like life insurance and home loans. The New Regime has lower buckets but fewer discount coupons." },
+            { type: "header", level: 2, text: "The Optimization Strategy" },
+            { type: "paragraph", text: "The smartest way to pay less tax legally is by using Tax-Advantaged Accounts. These are special buckets designed to protect your wealth. Here are three powerful strategies:" },
+            { type: "header", level: 3, text: "1. The Section 80C Bucket" },
+            { type: "paragraph", text: "Section 80C is the ultimate discount coupon. If you put your money into specific accounts like ELSS (mutual funds), EPF (provident fund), or PPF, the government ignores up to ₹1.5 Lakh of your income when calculating your taxes." },
+            { type: "header", level: 3, text: "2. The EEE Magic" },
+            { type: "paragraph", text: "Some accounts, like the PPF, have 'EEE' status (Exempt-Exempt-Exempt). In plain English: You pay no tax on the money going in, no tax as it grows, and absolutely no tax when you take it out. It is a perfect wealth shield." },
+            { type: "header", level: 3, text: "3. Health Insurance (Section 80D)" },
+            { type: "paragraph", text: "Buying a medical shield for your family also acts as a legal tax shield. The premiums you pay for health insurance act as another discount coupon, lowering the amount of money the government is allowed to look at." },
+            { type: "takeaways", items: [
+              "Gross income is what you make, net income is what you keep.",
+              "Tax brackets are like buckets that fill up.",
+              "Maximize your Section 80C discount coupons.",
+              "Pick the tax regime that saves you the most money."
+            ]}
+          ],
+          checkpoints: [
+            {
+              question: "What is the difference between Gross and Net income?",
+              options: [
+                "Gross is what you keep, Net is what you make",
+                "Gross is what you make, Net is what you keep after taxes",
+                "They are exactly the same thing"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "What is a tax deduction?",
+              options: [
+                "A penalty for paying late",
+                "An extra fee added to your bill",
+                "A discount coupon that lowers the money the government looks at"
+              ],
+              correctAnswer: 2
+            },
+            {
+              question: "If you get a raise and move into a higher tax bracket, does all your money get taxed at the higher rate?",
+              options: [
+                "Yes, all your money gets taxed higher",
+                "No, only the money in that specific bucket gets taxed higher",
+                "It depends on your job"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "Why is it important to use government-approved retirement accounts?",
+              options: [
+                "They often act as a massive discount coupon on your current taxes",
+                "They let you withdraw money anytime without rules",
+                "They guarantee that you will become a millionaire"
+              ],
+              correctAnswer: 0
+            },
+            {
+              question: "What is the main goal of tax optimization?",
+              options: [
+                "To avoid paying any taxes illegally",
+                "To pay more money to the government than you need to",
+                "To legally minimize your taxes so you keep more of your own money"
+              ],
+              correctAnswer: 2
+            }
+          ]
+        },
+        'US': {
+          title: "Taxes: The Wealth Accelerator",
+          readTime: "10 min",
+          category: "Tax Optimization",
+          sections: [
+            { type: "header", level: 2, text: "How Taxes Work" },
+            { type: "paragraph", text: "Taxes are the money you pay to the government to keep the country running. Gross income is all the money you make. Net income is the money you actually get to keep after taxes. Maximizing the money you keep is how you build wealth faster." },
+            { type: "header", level: 2, text: "The Regional Breakdown: US" },
+            { type: "paragraph", text: "In the US, income tax works like filling up buckets with water. As you earn more, your money spills into bigger tax buckets that take a higher percentage. A tax deduction is like a discount coupon. It lowers the amount of money the government is allowed to look at. Everyone gets a basic discount coupon called the Standard Deduction." },
+            { type: "header", level: 2, text: "The Optimization Strategy" },
+            { type: "paragraph", text: "The easiest way to keep more of your money is to use Tax-Advantaged Accounts. These are protective shields for your money. Here are three powerful strategies:" },
+            { type: "header", level: 3, text: "1. The 401(k) Match" },
+            { type: "paragraph", text: "Your 401(k) is a retirement bucket. By putting money in, you lower your current tax level. Even better, if your boss offers a 'match', that is literal free money. Always take the free money." },
+            { type: "header", level: 3, text: "2. Traditional vs. Roth IRA" },
+            { type: "paragraph", text: "Think of an IRA like a farmer's crop. With a Traditional IRA, you get a tax discount now, but pay taxes later when you harvest. With a Roth IRA, you pay taxes on the seed now, but the entire harvest later is completely tax free." },
+            { type: "header", level: 3, text: "3. The HSA Loophole" },
+            { type: "paragraph", text: "A Health Savings Account (HSA) is the ultimate triple-tax-free loophole. You get a tax discount when you put money in, the money grows tax free, and if you use it for medical costs, taking it out is also tax free." },
+            { type: "takeaways", items: [
+              "Gross income is what you make, net income is what you keep.",
+              "You only pay higher taxes on the money inside the higher buckets.",
+              "Use your 401(k) to lower your tax bill.",
+              "Deductions act like discount coupons on your income."
+            ]}
+          ],
+          checkpoints: [
+            {
+              question: "What is the difference between Gross and Net income?",
+              options: [
+                "Gross is what you keep, Net is what you make",
+                "Gross is what you make, Net is what you keep after taxes",
+                "They are exactly the same thing"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "What is a tax deduction?",
+              options: [
+                "A penalty for paying late",
+                "An extra fee added to your bill",
+                "A discount coupon that lowers the money the government looks at"
+              ],
+              correctAnswer: 2
+            },
+            {
+              question: "If you get a raise and move into a higher tax bracket, does all your money get taxed at the higher rate?",
+              options: [
+                "Yes, all your money gets taxed higher",
+                "No, only the money in that specific bucket gets taxed higher",
+                "It depends on your job"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "Why is it important to use government-approved retirement accounts?",
+              options: [
+                "They often act as a massive discount coupon on your current taxes",
+                "They let you withdraw money anytime without rules",
+                "They guarantee that you will become a millionaire"
+              ],
+              correctAnswer: 0
+            },
+            {
+              question: "What is the main goal of tax optimization?",
+              options: [
+                "To avoid paying any taxes illegally",
+                "To pay more money to the government than you need to",
+                "To legally minimize your taxes so you keep more of your own money"
+              ],
+              correctAnswer: 2
+            }
+          ]
+        },
+        'UK': {
+          title: "Taxes: The Wealth Accelerator",
+          readTime: "10 min",
+          category: "Tax Optimization",
+          sections: [
+            { type: "header", level: 2, text: "How Taxes Work" },
+            { type: "paragraph", text: "Taxes are the money you pay to the government to keep the country running. Gross income is all the money you make. Net income is the money you actually get to keep after taxes. Maximizing the money you keep is how you build wealth faster." },
+            { type: "header", level: 2, text: "The Regional Breakdown: UK" },
+            { type: "paragraph", text: "In the UK, income tax works like filling up buckets with water. The first bucket is called your Personal Allowance, and the money in this bucket is completely tax free. After that, your money spills into higher buckets where the tax rate goes up. A deduction is like a discount coupon that shrinks the amount of money the government looks at." },
+            { type: "header", level: 2, text: "The Optimization Strategy" },
+            { type: "paragraph", text: "The smartest way to protect your money from taxes is by using Tax-Advantaged Accounts to shield your wealth. Here are the most powerful strategies in the UK:" },
+            { type: "header", level: 3, text: "1. The ISA Shield" },
+            { type: "paragraph", text: "The Individual Savings Account (ISA) is an invisible wealth shield. You can put up to £20,000 in it every year, and the government cannot touch any of the growth or dividends. It is completely tax free forever." },
+            { type: "header", level: 3, text: "2. Pension Relief" },
+            { type: "paragraph", text: "Putting money into your pension is incredibly powerful. The government literally tops up your retirement contributions as a reward for saving. If you are a basic rate taxpayer, for every £80 you put in, the government adds £20." },
+            { type: "header", level: 3, text: "3. Salary Sacrifice" },
+            { type: "paragraph", text: "This is a legal agreement to give up part of your salary in exchange for employer pension contributions. Because your official salary goes down, both you and your employer pay less National Insurance, leaving more money in your bucket." },
+            { type: "takeaways", items: [
+              "Gross income is what you make, net income is what you keep.",
+              "Your Personal Allowance is your tax free bucket.",
+              "Always use your ISA to grow money tax free.",
+              "Pension contributions lower your tax bill today."
+            ]}
+          ],
+          checkpoints: [
+            {
+              question: "What is the difference between Gross and Net income?",
+              options: [
+                "Gross is what you keep, Net is what you make",
+                "Gross is what you make, Net is what you keep after taxes",
+                "They are exactly the same thing"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "What is a tax deduction?",
+              options: [
+                "A penalty for paying late",
+                "An extra fee added to your bill",
+                "A discount coupon that lowers the money the government looks at"
+              ],
+              correctAnswer: 2
+            },
+            {
+              question: "If you get a raise and move into a higher tax bracket, does all your money get taxed at the higher rate?",
+              options: [
+                "Yes, all your money gets taxed higher",
+                "No, only the money in that specific bucket gets taxed higher",
+                "It depends on your job"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "Why is it important to use government-approved retirement accounts?",
+              options: [
+                "They often act as a massive discount coupon on your current taxes",
+                "They let you withdraw money anytime without rules",
+                "They guarantee that you will become a millionaire"
+              ],
+              correctAnswer: 0
+            },
+            {
+              question: "What is the main goal of tax optimization?",
+              options: [
+                "To avoid paying any taxes illegally",
+                "To pay more money to the government than you need to",
+                "To legally minimize your taxes so you keep more of your own money"
+              ],
+              correctAnswer: 2
+            }
+          ]
+        },
+        'Switzerland': {
+          title: "Taxes: The Wealth Accelerator",
+          readTime: "10 min",
+          category: "Tax Optimization",
+          sections: [
+            { type: "header", level: 2, text: "How Taxes Work" },
+            { type: "paragraph", text: "Taxes are the money you pay to the government to keep the country running. Gross income is all the money you make. Net income is the money you actually get to keep after taxes. Maximizing the money you keep is how you build wealth faster." },
+            { type: "header", level: 2, text: "The Regional Breakdown: Switzerland" },
+            { type: "paragraph", text: "In Switzerland, tax works like filling up buckets with water. As you earn more, your money spills into bigger buckets called tax brackets at the federal, cantonal, and communal levels. A tax deduction is like a discount coupon that lowers the amount of money the government is allowed to look at." },
+            { type: "header", level: 2, text: "The Optimization Strategy" },
+            { type: "paragraph", text: "The easiest way to save on taxes is by understanding how the Swiss system is structured. Here are three powerful strategies to protect your money:" },
+            { type: "header", level: 3, text: "1. The Pillar 3a Vault" },
+            { type: "paragraph", text: "Pillar 3a is your private wealth vault. Every franc you put into this account legally shrinks your taxable income at the end of the year. It is a massive discount coupon that you should use every single year." },
+            { type: "header", level: 3, text: "2. Pillar 2 Buy-Ins" },
+            { type: "paragraph", text: "If you have gaps in your occupational pension (Pillar 2), you can voluntarily buy into it. This money is immediately deducted from your taxable income, saving you a huge amount of tax while setting you up for retirement." },
+            { type: "header", level: 3, text: "3. Canton Wealth Taxes" },
+            { type: "paragraph", text: "Switzerland charges a wealth tax, which taxes the total value of your assets. However, the size of your tax buckets changes depending on which Canton (state) you live in. Moving just one village over can drastically change how much you pay." },
+            { type: "takeaways", items: [
+              "Gross income is what you make, net income is what you keep.",
+              "Taxes change depending on which canton you live in.",
+              "Maximize your Pillar 3a account every year.",
+              "Use Pillar 2 buy-ins to lower your tax bill."
+            ]}
+          ],
+          checkpoints: [
+            {
+              question: "What is the difference between Gross and Net income?",
+              options: [
+                "Gross is what you keep, Net is what you make",
+                "Gross is what you make, Net is what you keep after taxes",
+                "They are exactly the same thing"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "What is a tax deduction?",
+              options: [
+                "A penalty for paying late",
+                "An extra fee added to your bill",
+                "A discount coupon that lowers the money the government looks at"
+              ],
+              correctAnswer: 2
+            },
+            {
+              question: "If you get a raise and move into a higher tax bracket, does all your money get taxed at the higher rate?",
+              options: [
+                "Yes, all your money gets taxed higher",
+                "No, only the money in that specific bucket gets taxed higher",
+                "It depends on your job"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "Why is it important to use government-approved retirement accounts?",
+              options: [
+                "They often act as a massive discount coupon on your current taxes",
+                "They let you withdraw money anytime without rules",
+                "They guarantee that you will become a millionaire"
+              ],
+              correctAnswer: 0
+            },
+            {
+              question: "What is the main goal of tax optimization?",
+              options: [
+                "To avoid paying any taxes illegally",
+                "To pay more money to the government than you need to",
+                "To legally minimize your taxes so you keep more of your own money"
+              ],
+              correctAnswer: 2
+            }
+          ]
+        },
+        'Global': {
+          title: "Taxes: The Wealth Accelerator",
+          readTime: "10 min",
+          category: "Tax Optimization",
+          sections: [
+            { type: "header", level: 2, text: "How Taxes Work" },
+            { type: "paragraph", text: "Taxes are the money you pay to the government to keep the country running. Gross income is all the money you make. Net income is the money you actually get to keep after taxes. Maximizing the money you keep is how you build wealth faster." },
+            { type: "header", level: 2, text: "The Regional Breakdown: Global Concepts" },
+            { type: "paragraph", text: "In most countries, tax works like filling up buckets with water. As you earn more, your money spills into bigger buckets called tax brackets, where the percentage goes up. A tax deduction is like a discount coupon. It lowers the amount of money the government is allowed to look at when calculating your bill." },
+            { type: "header", level: 2, text: "The Optimization Strategy" },
+            { type: "paragraph", text: "Almost everywhere in the world, the wealthy use the same fundamental strategies to legally minimize their taxes. Here are three universal concepts:" },
+            { type: "header", level: 3, text: "1. Earned Income vs. Capital Gains" },
+            { type: "paragraph", text: "Earned Income (trading your time for a salary) is the highest taxed money in the world. Capital Gains (money made when your assets go up in value) is taxed much more gently. Owning assets like stocks or real estate gets you preferential tax treatment." },
+            { type: "header", level: 3, text: "2. Tax-Advantaged Accounts" },
+            { type: "paragraph", text: "Governments want you to save for your own retirement. If you put money into special government approved retirement buckets, they reward you with a huge discount coupon, lowering the taxes you have to pay today." },
+            { type: "header", level: 3, text: "3. Tax-Loss Harvesting" },
+            { type: "paragraph", text: "If you sell an investment that lost money, you can use that loss as a discount coupon to cancel out the taxes you owe on investments that made money. This strategy turns a bad investment into a valuable tax shield." },
+            { type: "takeaways", items: [
+              "Gross income is what you make, net income is what you keep.",
+              "Tax brackets are like buckets that fill up.",
+              "Deductions act like discount coupons on your income.",
+              "Use government approved retirement accounts to save money."
+            ]}
+          ],
+          checkpoints: [
+            {
+              question: "What is the difference between Gross and Net income?",
+              options: [
+                "Gross is what you keep, Net is what you make",
+                "Gross is what you make, Net is what you keep after taxes",
+                "They are exactly the same thing"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "What is a tax deduction?",
+              options: [
+                "A penalty for paying late",
+                "An extra fee added to your bill",
+                "A discount coupon that lowers the money the government looks at"
+              ],
+              correctAnswer: 2
+            },
+            {
+              question: "If you get a raise and move into a higher tax bracket, does all your money get taxed at the higher rate?",
+              options: [
+                "Yes, all your money gets taxed higher",
+                "No, only the money in that specific bucket gets taxed higher",
+                "It depends on your job"
+              ],
+              correctAnswer: 1
+            },
+            {
+              question: "Why is it important to use government-approved retirement accounts?",
+              options: [
+                "They often act as a massive discount coupon on your current taxes",
+                "They let you withdraw money anytime without rules",
+                "They guarantee that you will become a millionaire"
+              ],
+              correctAnswer: 0
+            },
+            {
+              question: "What is the main goal of tax optimization?",
+              options: [
+                "To avoid paying any taxes illegally",
+                "To pay more money to the government than you need to",
+                "To legally minimize your taxes so you keep more of your own money"
+              ],
+              correctAnswer: 2
+            }
+          ]
+        }
+      };
+
+      const courseContent = regions[country] || regions['Global'];
+      res.json({ ...courseContent, region: country });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.get("/api/academy/progress", async (req, res) => {
     try {
       const { getUserProgress } = await import("./lib/actions/arsenal.actions");

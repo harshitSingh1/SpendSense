@@ -63,7 +63,15 @@ export default function BlackSwanSimulator({ currentBalance, dailyBurnRate, user
   const impactAmount = activeConfig ? activeConfig.impact : 0;
   const newBalance = currentBalance - impactAmount;
   const debtAccrued = newBalance < 0 ? Math.abs(newBalance) : 0;
-  const survivingRunway = newBalance > 0 && dailyBurnRate > 0 ? Math.floor(newBalance / dailyBurnRate) : 0;
+  
+  let survivingRunway = "0 Days";
+  if (newBalance > 0) {
+    if (dailyBurnRate > 0) {
+      survivingRunway = `${Math.floor(newBalance / dailyBurnRate)} Days`;
+    } else {
+      survivingRunway = "Infinite";
+    }
+  }
 
   const isBankrupt = newBalance < 0;
 
@@ -141,7 +149,7 @@ export default function BlackSwanSimulator({ currentBalance, dailyBurnRate, user
                   ) : (
                     <div className="space-y-2">
                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">
-                        Surviving Runway: {survivingRunway} Days
+                        Surviving Runway: {survivingRunway}
                       </h2>
                       <p className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-500">
                         Remaining Liquidity: {formatMoney(newBalance, userRegion)}

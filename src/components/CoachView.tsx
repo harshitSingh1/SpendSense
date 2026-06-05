@@ -374,7 +374,7 @@ export default function CoachView({
                   }
                 }}
                 rows={1}
-                placeholder={isLimitReached ? "⚠️ Daily limit reached. Upgrade to Pro." : "Message Stocrates..."} 
+                placeholder={isLimitReached ? "Daily limit reached. Upgrade to Pro." : "Message Stocrates..."} 
                 className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none py-3 px-2 text-sm md:text-base outline-none disabled:opacity-50"
                 disabled={isLoading || isLimitReached}
               />

@@ -9,6 +9,7 @@ export interface ProtectionMetrics {
   targetEmergencyFund: number;
   currentSavings: number;
   hasActiveInsurance: boolean;
+  insurancePaymentsCount: number;
   protectionScore: number;
 }
 

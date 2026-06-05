@@ -189,11 +189,11 @@ export function FinancialCalendar({ dailyCashflow, calendarNotes, monthlyTransac
                     onClick={() => setSelectedDate(isDate)}
                     className={`
                       relative aspect-square p-1 rounded-xl flex items-center justify-center transition-all group
-                      ${isSelected ? 'bg-primary/10 border-primary shadow-sm hover:bg-primary/20 scale-[1.02]' : 'bg-muted/30 border-transparent hover:bg-muted/60'}
+                      ${isSelected ? 'bg-primary/10 border-primary shadow-sm hover:bg-primary/20 scale-[1.02]' : 'bg-slate-50 border-transparent hover:bg-slate-100'}
                       border-2 overflow-hidden
                     `}
                   >
-                    <span className={`text-sm font-semibold z-10 ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                    <span className={`text-sm font-semibold z-10 ${isSelected ? 'text-primary' : 'text-slate-900'}`}>
                        {format(isDate, 'd')}
                     </span>
                     
@@ -232,13 +232,13 @@ export function FinancialCalendar({ dailyCashflow, calendarNotes, monthlyTransac
       </div>
 
       {/* RIGHT: Day Details Panel */}
-      <div className="w-full lg:w-[320px] shrink-0 border-t lg:border-t-0 lg:border-l border-border/50 pt-6 lg:pt-0 lg:pl-6 flex flex-col">
+      <div className="w-full lg:w-[320px] shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 pt-6 lg:pt-0 lg:pl-6 flex flex-col">
         {!selectedDate ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-muted/20 rounded-[2rem] border border-dashed border-border/50">
-             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary">
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
+             <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4 text-slate-400">
                 <StickyNote className="w-8 h-8 opacity-50" />
              </div>
-             <p className="text-sm font-bold text-muted-foreground">Select a date to view your financial pulse and journal entries.</p>
+             <p className="text-sm font-bold text-slate-500">Select a date to view your financial pulse and journal entries.</p>
           </div>
         ) : (
           <>
@@ -249,12 +249,12 @@ export function FinancialCalendar({ dailyCashflow, calendarNotes, monthlyTransac
 
             <div className="space-y-3 mb-6">
                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Inflow</span>
-                  <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">+₹{(selectedCashflow.income || 0).toLocaleString()}</span>
+                  <span className="text-xs font-bold text-emerald-700 uppercase tracking-widest">Inflow</span>
+                  <span className="font-mono font-bold text-emerald-700">+₹{(selectedCashflow.income || 0).toLocaleString()}</span>
                </div>
                <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-center justify-between">
-                  <span className="text-xs font-bold text-destructive/70 dark:text-destructive/80 uppercase tracking-widest">Outflow</span>
-                  <span className="font-mono font-bold text-destructive/70 dark:text-destructive/80">-₹{(selectedCashflow.expense || 0).toLocaleString()}</span>
+                  <span className="text-xs font-bold text-destructive/70 uppercase tracking-widest">Outflow</span>
+                  <span className="font-mono font-bold text-destructive/70">-₹{(selectedCashflow.expense || 0).toLocaleString()}</span>
                </div>
             </div>
 
@@ -291,7 +291,7 @@ export function FinancialCalendar({ dailyCashflow, calendarNotes, monthlyTransac
                    value={noteContent}
                    onChange={(e) => setNoteContent(e.target.value)}
                    placeholder="Log a significant purchase, reflection, or note for this day..."
-                   className="w-full h-[120px] lg:h-full resize-none bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-700/30 focus-visible:ring-amber-500/30 rounded-2xl p-4 text-sm font-medium transition-all"
+                   className="w-full h-[120px] lg:h-full resize-none bg-slate-50 border-slate-200 focus-visible:ring-primary/30 text-slate-900 rounded-2xl p-4 text-sm font-medium transition-all"
                  />
                </div>
                

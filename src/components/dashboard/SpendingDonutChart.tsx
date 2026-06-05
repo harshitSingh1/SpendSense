@@ -22,12 +22,12 @@ export default function SpendingDonutChart({ data }: SpendingDonutChartProps) {
 
   if (isEmpty) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-muted/20 rounded-3xl border border-dashed border-border">
+      <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-slate-50 border border-dashed border-slate-200 rounded-3xl">
         <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4 text-muted-foreground/30">
           <Wallet className="h-6 w-6" />
         </div>
-        <p className="text-sm font-medium text-muted-foreground">No expenses logged this month.</p>
-        <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/40 mt-1">Start tracking to see insights</p>
+        <p className="text-sm font-medium text-muted-foreground">Add expenses to track activity.</p>
+        <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/40 mt-1">Categorize your spending to see insights.</p>
       </div>
     );
   }
@@ -72,11 +72,11 @@ export default function SpendingDonutChart({ data }: SpendingDonutChartProps) {
 function CustomTooltip({ active, payload }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card/95 backdrop-blur-md border border-border/50 p-3 rounded-2xl shadow-xl">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 mb-1">
+      <div className="bg-white border border-slate-200 p-3 rounded-2xl shadow-xl">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 opacity-80 mb-1">
           {payload[0].name}
         </p>
-        <p className="text-sm font-mono font-black tracking-tighter text-foreground">
+        <p className="text-sm font-mono font-black tracking-tighter text-slate-900">
           ₹{(payload[0].value ?? 0).toLocaleString()}
         </p>
       </div>
