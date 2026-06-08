@@ -266,6 +266,10 @@ export default function App() {
     return <LandingPage 
       user={user} 
       onGetStarted={handleGetStarted} 
+      onViewPricing={() => {
+        setAppView("dashboard");
+        setActiveTab("pro");
+      }}
       onViewTerms={() => setAppView("terms")}
       onViewPrivacy={() => setAppView("privacy")}
       onViewContact={() => setAppView("contact")}

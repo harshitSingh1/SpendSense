@@ -49,12 +49,17 @@ Built on our **"Calm Intelligence" Design System** - featuring Deep Indigo backg
 SpendSense AI is broken down into interconnected, high-leverage engines:
 
 - 📊 **The Omni-Tracker:** A unified ledger that goes beyond generic charts. We categorize your cash flow into **Defensive Capital** (survival) and **Offensive Capital** (wealth generation).
+- 🧭 **Interactive Dashboard Tour:** Seamless onboarding flow to get new users acquainted with their financial command center.
 - 🎓 **Core Intelligence Academy:** Learn financial literacy through modular lessons and progress tracking.
 - 🥷 **Tactical Tools Directory (The Arsenal):** A master guide of global financial hacks across Travel, Food, Cabs, and Cashback to help you leverage your spending.
-- 🧠 **AI Portfolio Architect:** Features custom Boglehead generation limits to intelligently plan and architect your investments based on risk tolerance.
-- 🛡️ **Policy Auditor & Claim Enforcer:** Upload insurance details and get an AI audit of hidden clauses, or draft a grievance redressal to enforce your claim.
-- 📬 **Dynamic Notification Inbox:** Real-time push logic with a rolling window (7-doc auto-pruning) to keep your notifications clean and relevant.
-- 💬 **Persistent Chat History:** Stocrates, our AI CFO, powered by a syndicate of LLMs, remembers past context with a MongoDB-backed rolling chat window limit (40 messages).
+- 🧠 **AI Portfolio Architect & Shield View:** Intelligently plan and architect your investments. Includes an **Insurance Gap** calculator, **Policy Scanner**, and **Claim Enforcer** to audit hidden clauses and enforce claims.
+- 📈 **Wealth Visualizers & Simulators:** An array of interactive tools including **Black Swan Event Simulators**, **Compound Interest Visualizers**, and **Inflation Erosion Calculators**.
+- 🎯 **Financial Goals Engine:** Systematically create, track, and fund your personalized savings and investment goals.
+- 🎮 **Gamified Rank Dashboard:** Level up your finances and track your accomplishments with a progress-driven checkpoint system.
+- 🤖 **Stocrates AI Coach:** AI-driven, context-aware coaching for your personalized financial strategy, remembering past context with a MongoDB-backed rolling chat window.
+- 📬 **Dynamic Notification Inbox:** Real-time push alerts with a rolling window to keep you informed on budget limits and strategic opportunities.
+- ⌘ **Omni-Command Palette:** Instantly navigate across all application modules, tools, and actions like a power user.
+- 🌟 **Premium Experiences:** Seamless Pro-tier upgrade integration allowing users to checkout and unlock advanced institutional-grade analysis.
 
 ## 🛠️ Tech Stack
 
