@@ -222,18 +222,25 @@ async function startServer() {
       }
 
       let aiInsight = "The market rewards patience and consistent strategy over time.";
+      let generated = false;
       
       if (process.env.GEMINI_API_KEY) {
-        const aiClient = getAIClient();
-        const prompt = "Generate a short, generic daily financial wisdom quote or market brief (max 2 sentences).";
-        
-        const response = await aiClient.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: prompt,
-        });
-        
-        if (response && response.text) {
-          aiInsight = response.text.trim();
+        try {
+          const aiClient = getAIClient();
+          const prompt = "Generate a short, generic daily financial wisdom quote or market brief (max 2 sentences).";
+          
+          const response = await aiClient.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: prompt,
+          });
+          
+          if (response && response.text) {
+            aiInsight = response.text.trim();
+            generated = true;
+          }
+        } catch (error: any) {
+          console.error("AI Generation failed:", error);
+          return res.status(200).json({ status: 'aborted', reason: 'AI Generation failed', details: error.message });
         }
       }
 
@@ -247,25 +254,33 @@ async function startServer() {
           { isPro: true },
           { proExpiresAt: { $gt: now } }
         ]
-      }, '_id');
+      }, '_id email');
 
-      if (proUsers.length > 0) {
-        const insertDocs = proUsers.map(user => ({
-          userId: user._id,
-          title: '📈 Daily Market Brief',
-          message: aiInsight,
-          type: 'system',
-          isRead: false,
-          createdAt: new Date(),
-        }));
-        await NotificationModel.insertMany(insertDocs);
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const user of proUsers) {
+        try {
+          await NotificationModel.create({
+            userId: user._id,
+            title: '📈 Daily Market Brief',
+            message: aiInsight,
+            type: 'system',
+            isRead: false,
+            createdAt: new Date(),
+          });
+          successCount++;
+        } catch (error: any) {
+          console.error('Failed for user:', user.email || user._id);
+          failCount++;
+        }
       }
 
-      console.log(`✅ Daily Market Brief sent to ${proUsers.length} Pro users.`);
-      return res.status(200).json({ success: true, processed: proUsers.length });
+      console.log(`✅ Daily Market Brief sent to ${successCount} Pro users. Failed: ${failCount}`);
+      return res.status(200).json({ success: true, generated: true, usersProcessed: successCount, usersFailed: failCount });
     } catch (error: any) {
-      console.error('❌ Daily Market Brief CRON Failed:', error);
-      return res.status(500).json({ error: error.message || 'Internal Server Error' });
+      console.error('CRON MARKET BRIEF FATAL ERROR:', error);
+      return res.status(500).json({ error: error.message, stack: error.stack });
     }
   });
 
