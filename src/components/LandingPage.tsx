@@ -155,21 +155,8 @@ export default function LandingPage({ onGetStarted, onViewPricing, onViewTerms, 
       <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl shrink-0 h-16">
         <div className="container mx-auto max-w-7xl flex h-full items-center justify-between px-6 md:px-10">
           <div className="flex items-center gap-2">
-            <motion.div
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            >
-              <Logo className="h-8 w-8" />
-            </motion.div>
-            <motion.span 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-              className="text-xl font-sonsie tracking-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400"
-            >
-              SpendSense
-            </motion.span>
+            <Logo className="h-8 w-8" />
+            <span className="text-xl font-sonsie tracking-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400">SpendSense</span>
           </div>
           <motion.nav 
             initial={{ opacity: 0, y: -10 }}
@@ -227,9 +214,9 @@ export default function LandingPage({ onGetStarted, onViewPricing, onViewTerms, 
                   hidden: { y: 20, opacity: 0 },
                   visible: { y: 0, opacity: 1, transition: { duration: 0.6 } }
                 }}
-                className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 leading-tight"
+                className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 leading-tight"
               >
-                <div className="block">Move Beyond Passive Budgeting.</div>
+                <div className="block">Move Beyond <br /> Passive Budgeting.</div>
                 <div className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-emerald-400">
                   Engineer Your Wealth.
                 </div>

@@ -343,9 +343,9 @@ export default function App() {
             {/* Logo in Navbar */}
             <div className="flex items-center gap-2 sm:gap-3 cursor-pointer mr-2 sm:mr-4" onClick={() => setAppView("landing")}>
               <Logo className="h-8 w-8 sm:h-10 sm:w-10 shrink-0" />
-              <h1 className="hidden sm:block text-lg md:text-xl font-sonsie tracking-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400 whitespace-nowrap">
+              <span className="hidden sm:block text-2xl font-sonsie tracking-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400 whitespace-nowrap">
                 SpendSense
-              </h1>
+              </span>
             </div>
 
             <Sheet>
@@ -360,7 +360,7 @@ export default function App() {
                   <div className="mb-8 flex items-center justify-between w-full mt-2">
                      <div className="flex items-center gap-3 cursor-pointer" onClick={() => setAppView("landing")}>
                        <Logo className="h-8 w-8 shrink-0" />
-                       <span className="font-sonsie tracking-normal text-lg bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400 whitespace-nowrap">SpendSense</span>
+                       <span className="font-sonsie tracking-normal text-2xl bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400 whitespace-nowrap">SpendSense</span>
                      </div>
                   </div>
 

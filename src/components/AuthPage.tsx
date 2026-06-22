@@ -156,7 +156,7 @@ export default function AuthPage({ onBack, onGoogleSignIn, onForgotPassword }: A
         <div className="container mx-auto max-w-7xl flex h-full items-center justify-between px-6 md:px-10">
           <div className="flex items-center gap-2 cursor-pointer" onClick={onBack}>
             <Logo className="h-8 w-8" />
-            <span className="text-xl font-sonsie tracking-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400">SpendSense</span>
+            <span className="text-2xl font-sonsie tracking-normal bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 dark:from-violet-400 dark:via-blue-400 dark:to-emerald-400">SpendSense</span>
           </div>
           <Button variant="ghost" size="sm" onClick={onBack} className="flex gap-2 font-bold hover:bg-indigo-500/10 hover:text-indigo-600">
             <ArrowLeft className="h-4 w-4" /> Back Home

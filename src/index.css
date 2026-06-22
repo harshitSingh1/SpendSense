@@ -1,4 +1,6 @@
 @import '@fontsource-variable/geist';
+@import url('https://fonts.googleapis.com/css2?family=Sonsie+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oleo+Script:wght@400;700&family=Sonsie+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
@@ -9,7 +11,8 @@
 
 @theme inline {
     --font-heading: "Playfair Display", serif;
-    --font-sonsie: "Geist Variable", sans-serif; /* Replaced Sonsie with Geist */
+    --font-logo: "Oleo Script", cursive;
+    --font-sonsie: "Sonsie One", cursive;
     --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
     
