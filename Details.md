@@ -1,4 +1,4 @@
-# SpendSense AI — Project Details, Inspiration & Architecture
+# SpendSense AI: Project Details, Inspiration & Architecture
 
 > **"Most people don't have an income problem; they have an architecture problem."**  
 > SpendSense AI is an intelligent, full-stack personal wealth operating system built to give individuals institutional-grade financial clarity, aggressive policy defense, and calm, disciplined asset growth.
@@ -10,15 +10,15 @@
 The idea for SpendSense was born out of profound frustration with the state of existing personal finance applications.
 
 ### The "Passive Rearview Mirror" Problem
-Almost every modern budgeting app operates as an autopsy tool. They notify you *after* you have already overspent on dinner, categorizing expenses into colorful charts while offering zero forward-looking strategy. They tell you where your money went, but never how to deploy it strategically to escape the treadmill of living paycheck-to-paycheck.
+Almost every modern budgeting app operates as an autopsy tool. They notify you after you have already overspent on dinner, categorizing expenses into colorful charts while offering zero forward-looking strategy. They tell you where your money went, but never how to deploy it strategically to escape the treadmill of living paycheck-to-paycheck.
 
 ### The Health Insurance Wake-Up Call
-The tipping point came during a personal medical crisis. Like millions of working families, the assumption was that paying hefty health insurance premiums meant complete protection. When the hospital bill arrived, the insurer applied obscure sub-clauses buried on page 42 of the policy document—specifically a **1% Room Rent Capping** and an unexpected proportionate deduction. This single fine-print trick forced over 40% of the bill to be paid out-of-pocket, wiping out months of hard-earned savings.
+The tipping point came during a personal medical crisis. Like millions of working families, the assumption was that paying hefty health insurance premiums meant complete protection. When the hospital bill arrived, the insurer applied obscure sub-clauses buried on page 42 of the policy document, specifically a **1% Room Rent Capping** and an unexpected proportionate deduction. This single fine-print trick forced over 40% of the bill to be paid out-of-pocket, wiping out months of hard-earned savings.
 
 Reading fine print in legal policy jargon is deliberately intimidating. Insurers count on customer fatigue. We realized that AI could be the ultimate consumer defense mechanism: an unyielding auditor that instantly reads insurance contracts, flags predatory exclusions, and equips users with regulatory-backed dispute letters before insurers can take advantage of them.
 
 ### The Need for a Stoic Financial Mind: Stocrates
-Financial advice in the digital age is plagued by noise—get-rich-quick crypto schemes, fear-mongering market commentary, and high-commission product peddling. Ambitious earners need an objective, calm, math-first strategist who understands modern portfolio theory, risk horizons, and tax-efficient compounding without emotional panic. Thus, **Stocrates**—the AI Chief Financial Officer—was created.
+Financial advice in the digital age is plagued by noise: get-rich-quick crypto schemes, fear-mongering market commentary, and high-commission product peddling. Ambitious earners need an objective, calm, math-first strategist who understands modern portfolio theory, risk horizons, and tax-efficient compounding without emotional panic. Thus, **Stocrates**, the AI Chief Financial Officer, was created.
 
 ---
 
@@ -28,7 +28,7 @@ SpendSense AI was founded on three non-negotiable principles:
 
 1. **Active Capital Division (Offensive vs. Defensive):** Money is not a monolith. Survival funds must be guarded fiercely, while excess capital must be aggressively deployed into compounding assets.
 2. **Asymmetric Consumer Defense:** Giving ordinary individuals the legal and analytical power of an insurance lawyer and wealth advisor directly in their pocket.
-3. **Calm, High-Leverage Intelligence:** Replacing financial anxiety with clarity. No doom-scrolling, no cluttered ads, no selling user data to loan sharks—just pristine architecture and actionable execution.
+3. **Calm, High-Leverage Intelligence:** Replacing financial anxiety with clarity. No doom-scrolling, no cluttered ads, no selling user data to loan sharks: just pristine architecture and actionable execution.
 
 ---
 
@@ -36,26 +36,26 @@ SpendSense AI was founded on three non-negotiable principles:
 
 SpendSense AI unifies five critical dimensions of personal wealth into a cohesive operating system:
 
-### 🛡️ Pillar 1: Protect — The Policy Auditor & Claim Enforcer
+### 🛡️ Pillar 1: Protect (The Policy Auditor & Claim Enforcer)
 - **Instant Document Ingestion:** Upload any health or term insurance policy PDF.
 - **Deep Clause Forensics:** Powered by Gemini AI, the auditor scans for high-risk clauses:
   - Room rent sub-limits and proportionate deductions
   - Disease-specific waiting periods and exclusions
   - Copayment requirements and non-payable consumables
-- **The Claim Enforcer:** When an insurer wrongfully rejects or minimizes a claim, the Enforcer automatically generates an aggressive, legally structured dispute notice citing relevant insurance regulations (e.g., IRDAI guidelines in India or standard ombudsman precedents) to demand immediate re-adjudication.
+- **The Claim Enforcer:** When an insurer wrongfully rejects or minimizes a claim, the Enforcer automatically generates an aggressive, legally structured dispute notice citing relevant insurance regulations (such as IRDAI guidelines or standard ombudsman precedents) to demand immediate re-adjudication.
 
-### 📊 Pillar 2: Track — The Omni-Tracker
+### 📊 Pillar 2: Track (The Omni-Tracker)
 - **Offensive vs. Defensive Separation:** Automatically separates monthly cashflow into:
   - **Defensive Capital (Needs & Survival Buffer):** Rent, groceries, debt service, utilities, and emergency reserves.
   - **Offensive Capital (Wealth Compounding):** Systematic Investment Plans (SIPs), index funds, venture bets, and strategic equity.
-- **Live Sync & Cashflow Telemetry:** Visual indicators for allocation ratios (e.g., 60/40 split), spending velocity, and real-time gap detection against target savings goals.
+- **Live Sync & Cashflow Telemetry:** Visual indicators for allocation ratios (such as 60/40 split), spending velocity, and real-time gap detection against target savings goals.
 
-### 🧠 Pillar 3: Grow — Stocrates (AI CFO) & Portfolio Architect
+### 🧠 Pillar 3: Grow (Stocrates AI CFO & Portfolio Architect)
 - **Algorithmic Asset Allocation:** Dynamically computes risk-adjusted portfolios based on time horizon, income stability, and risk appetite.
-- **Interactive Conversational Advisory:** Chat with Stocrates about real scenarios (e.g., *"I have ₹25,000 extra this month. Should I prepay my home loan or invest in Nifty 50?"*). Stocrates runs the mathematical comparison, factoring in post-tax returns, inflation, and interest rate differentials.
+- **Interactive Conversational Advisory:** Chat with Stocrates about real scenarios (for example, *"I have ₹25,000 extra this month. Should I prepay my home loan or invest in Nifty 50?"*). Stocrates runs the mathematical comparison, factoring in post-tax returns, inflation, and interest rate differentials.
 - **Goal Engineering:** Milestone projections for emergency funds, home down payments, and early financial independence.
 
-### ⚡ Pillar 4: Learn — The Tactical Arsenal
+### ⚡ Pillar 4: Learn (The Tactical Arsenal)
 - **Arbitrage Playbooks:** Real-world strategies for cutting recurring living expenses without lowering lifestyle quality:
   - *Food & Dining:* Multi-restaurant cloud kitchen delivery, pre-booked 50% dining discounts, credit card voucher multipliers.
   - *Travel & Flight Engineering:* ITA Matrix date grids, Hidden City ticketing loopholes, aircraft seat configuration verification.
