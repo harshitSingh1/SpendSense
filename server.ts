@@ -221,6 +221,23 @@ async function startServer() {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
+      await dbConnect();
+      const NotificationModel = (await import("./lib/models/Notification")).default;
+
+      const startOfDay = new Date(); 
+      startOfDay.setUTCHours(0,0,0,0);
+      const endOfDay = new Date(); 
+      endOfDay.setUTCHours(23,59,59,999);
+
+      const alreadyRanToday = await NotificationModel.findOne({ 
+        title: '📈 Daily Market Brief', 
+        createdAt: { $gte: startOfDay, $lte: endOfDay } 
+      });
+
+      if (alreadyRanToday) {
+        return res.status(200).json({ status: 'keep-alive', message: 'Brief already generated today. Server is awake.' });
+      }
+
       let aiInsight = "The market rewards patience and consistent strategy over time.";
       let generated = false;
       
@@ -244,9 +261,7 @@ async function startServer() {
         }
       }
 
-      await dbConnect();
       const User = (await import("./lib/models/User")).default;
-      const NotificationModel = (await import("./lib/models/Notification")).default;
 
       const now = new Date();
       const proUsers = await User.find({

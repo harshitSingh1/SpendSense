@@ -25,7 +25,15 @@ import {
   Target,
   Zap,
   TreePine,
-  ArrowUpRight
+  ArrowUpRight,
+  FileText,
+  AlertTriangle,
+  Bot,
+  MessageSquare,
+  Briefcase,
+  GraduationCap,
+  Play,
+  Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./ui/Logo";
@@ -94,17 +102,118 @@ function YourBlueprintToWealth() {
             <p className="text-slate-900 dark:text-slate-300 font-bold mb-2">How to use it:</p>
             <p className="text-slate-600 dark:text-slate-400">Connect your accounts or log cashflows. The AI automatically separates your money into Defensive Capital (for survival) and Offensive Capital (for investing).</p>
           </div>
-          <div className="order-1 md:order-2 bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-3xl h-64 flex items-center justify-center text-slate-400 relative overflow-hidden">
-            <PieChart className="w-16 h-16 opacity-50 relative z-10" />
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none"></div>
+          <div className="order-1 md:order-2 bg-white dark:bg-[#0e162d] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:border-emerald-500/30 transition-colors duration-500">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none transition-transform duration-700 group-hover:scale-125"></div>
+            
+            <div className="relative z-10 flex flex-col h-full">
+               <div className="flex justify-between items-center mb-6">
+                 <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+                     <PieChart className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                   </div>
+                   <div>
+                     <p className="font-bold text-slate-900 dark:text-white text-sm">Omni-Tracker</p>
+                     <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Real-time Allocation</p>
+                   </div>
+                 </div>
+                 <div className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/30 shadow-sm flex items-center gap-1.5">
+                   <span className="relative flex h-2 w-2">
+                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                   </span>
+                   Live Sync
+                 </div>
+               </div>
+
+               <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-white/5 shadow-sm">
+                     <p className="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5 break-words whitespace-nowrap"><ShieldCheck className="w-3.5 h-3.5 text-blue-500" /> Defensive</p>
+                     <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">60%</p>
+                     <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mt-3 overflow-hidden">
+                        <div className="bg-blue-500 h-1.5 rounded-full w-[60%] shadow-[0_0_8px_#3b82f6]"></div>
+                     </div>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-white/5 shadow-sm">
+                     <p className="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5 break-words whitespace-nowrap"><TrendingUp className="w-3.5 h-3.5 text-emerald-500" /> Offensive</p>
+                     <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">40%</p>
+                     <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mt-3 overflow-hidden">
+                        <div className="bg-emerald-500 h-1.5 rounded-full w-[40%] shadow-[0_0_8px_#10b981]"></div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-4 border border-indigo-100 dark:border-indigo-500/20 flex items-center gap-4 mt-auto">
+                 <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center border border-indigo-200 dark:border-indigo-500/30 shrink-0 shadow-sm">
+                    <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                 </div>
+                 <div>
+                    <p className="text-[12px] font-bold text-indigo-900 dark:text-indigo-100 mb-0.5">AI Optimization</p>
+                    <p className="text-[11px] text-indigo-700 dark:text-indigo-300/80 leading-tight">Shift <strong>₹5,000</strong> to Offensive Capital to stay on track for your Goa Trip goal.</p>
+                 </div>
+               </div>
+            </div>
           </div>
         </div>
 
         {/* Step 2 */}
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-3xl h-64 flex items-center justify-center text-slate-400 relative overflow-hidden">
-            <ShieldCheck className="w-16 h-16 opacity-50 relative z-10" />
-            <div className="absolute inset-0 bg-gradient-to-bl from-indigo-500/5 to-transparent pointer-events-none"></div>
+          <div className="bg-white dark:bg-[#0e162d] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:border-indigo-500/30 transition-colors duration-500 h-[320px]">
+            <div className="absolute top-0 left-0 w-64 h-64 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none transition-transform duration-700 group-hover:scale-125"></div>
+            
+            <div className="relative z-10 flex flex-col h-full">
+               <div className="flex justify-between items-center mb-5">
+                 <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20 shadow-sm">
+                     <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                   </div>
+                   <div>
+                     <p className="font-bold text-slate-900 dark:text-white text-sm">Policy Auditor</p>
+                     <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">HDFC Optima Restore PDF</p>
+                   </div>
+                 </div>
+                 <div className="text-[10px] font-semibold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/40 px-3 py-1.5 rounded-full border border-rose-200 dark:border-rose-500/30 shadow-sm flex items-center gap-1.5">
+                   <AlertTriangle className="w-3 h-3" />
+                   Risks Found
+                 </div>
+               </div>
+
+               <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-white/5 shadow-sm relative overflow-hidden mb-4 flex flex-col">
+                  {/* Subtle scanline effect */}
+                  <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(99,102,241,0.05),transparent)] bg-[length:100%_4px] opacity-50 dark:opacity-20 pointer-events-none animate-[shimmer_2s_linear_infinite]"></div>
+                  
+                  <div className="space-y-3 relative z-10">
+                     <div className="flex justify-between items-start">
+                        <div className="flex gap-2 items-center">
+                           <FileText className="w-4 h-4 text-slate-400" />
+                           <div className="h-2 w-32 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                        </div>
+                        <div className="h-2 w-8 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                     </div>
+                     <div className="pl-6 space-y-2">
+                        <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                        <div className="h-1.5 w-[80%] bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                     </div>
+                     
+                     <div className="relative group/clause cursor-pointer mt-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-500/30 rounded-lg p-2.5 shadow-sm transition-all hover:bg-rose-100 dark:hover:bg-rose-900/30">
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                           <XCircle className="w-3 h-3 text-rose-500" />
+                           <span className="text-[10px] font-bold text-rose-700 dark:text-rose-300">Room Rent Capping Detected</span>
+                        </div>
+                        <p className="text-[10px] text-rose-600 dark:text-rose-400/90 leading-tight">Clause 3.4 restricts room rent to 1% of Sum Insured. This exposes you to massive out-of-pocket expenses.</p>
+                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-rose-500 rounded-r-lg"></div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="flex items-center justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400 px-1 mt-auto">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> 14 Safe Clauses
+                  </div>
+                  <div className="flex items-center gap-1 text-rose-600 dark:text-rose-400">
+                    <AlertTriangle className="w-3.5 h-3.5" /> 2 Hidden Risks
+                  </div>
+               </div>
+            </div>
           </div>
           <div className="text-left">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-bold text-xl mb-6">2</div>
@@ -126,17 +235,129 @@ function YourBlueprintToWealth() {
             <p className="text-slate-900 dark:text-slate-300 font-bold mb-2">How to use it:</p>
             <p className="text-slate-600 dark:text-slate-400">Chat with Stocrates, our AI CFO. Ask it how to allocate your monthly savings, and it will build a custom, risk-adjusted portfolio for you.</p>
           </div>
-          <div className="order-1 md:order-2 bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-3xl h-64 flex items-center justify-center text-slate-400 relative overflow-hidden">
-             <LineChart className="w-16 h-16 opacity-50 relative z-10" />
-             <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent pointer-events-none"></div>
+          <div className="order-1 md:order-2 bg-white dark:bg-[#0e162d] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:border-violet-500/30 transition-colors duration-500 h-[320px] flex flex-col">
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-violet-500/5 dark:bg-violet-500/10 rounded-full blur-3xl pointer-events-none transition-transform duration-700 group-hover:scale-125"></div>
+             
+             <div className="relative z-10 flex flex-col h-full">
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-500/10 flex items-center justify-center border border-violet-100 dark:border-violet-500/20 shadow-sm shrink-0">
+                    <Bot className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">Stocrates AI</h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Chief Financial Officer</p>
+                  </div>
+                </div>
+
+                {/* Chat window */}
+                <div className="flex-1 overflow-hidden flex flex-col gap-3">
+                   {/* User message */}
+                   <div className="self-end bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] border border-slate-200 dark:border-white/5 shadow-sm">
+                      <p className="text-[11px] text-slate-700 dark:text-slate-300 font-medium">I have ₹20,000 extra this month. Where should I put it?</p>
+                   </div>
+                   
+                   {/* AI message */}
+                   <div className="self-start bg-violet-50 dark:bg-violet-900/20 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[95%] border border-violet-100 dark:border-violet-500/20 shadow-sm relative">
+                      {/* Triangle pointer */}
+                      <div className="absolute -left-2 top-3 w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-violet-100 dark:border-r-violet-900/20 border-b-[8px] border-b-transparent"></div>
+                      
+                      <p className="text-[11px] text-slate-700 dark:text-slate-200 mb-3 leading-relaxed font-medium">Let's put that to work. Based on your moderate risk profile, here is the optimal split:</p>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[10px] bg-white dark:bg-[#0e162d] rounded-lg px-2.5 py-1.5 border border-slate-100 dark:border-white/5 shadow-sm">
+                           <div className="flex items-center gap-1.5">
+                             <TrendingUp className="w-3 h-3 text-emerald-500" />
+                             <span className="font-bold text-slate-900 dark:text-slate-300">Index Funds (Nifty 50)</span>
+                           </div>
+                           <span className="font-black text-slate-800 dark:text-slate-200">₹12,000</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] bg-white dark:bg-[#0e162d] rounded-lg px-2.5 py-1.5 border border-slate-100 dark:border-white/5 shadow-sm">
+                           <div className="flex items-center gap-1.5">
+                             <Briefcase className="w-3 h-3 text-blue-500" />
+                             <span className="font-bold text-slate-900 dark:text-slate-300">Emergency Fund</span>
+                           </div>
+                           <span className="font-black text-slate-800 dark:text-slate-200">₹5,000</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] bg-white dark:bg-[#0e162d] rounded-lg px-2.5 py-1.5 border border-slate-100 dark:border-white/5 shadow-sm">
+                           <div className="flex items-center gap-1.5">
+                             <LineChart className="w-3 h-3 text-violet-500" />
+                             <span className="font-bold text-slate-900 dark:text-slate-300">High-Growth Tech</span>
+                           </div>
+                           <span className="font-black text-slate-800 dark:text-slate-200">₹3,000</span>
+                        </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
           </div>
         </div>
 
         {/* Step 4 */}
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-3xl h-64 flex items-center justify-center text-slate-400 relative overflow-hidden">
-            <BookOpen className="w-16 h-16 opacity-50 relative z-10" />
-            <div className="absolute inset-0 bg-gradient-to-bl from-blue-500/5 to-transparent pointer-events-none"></div>
+          <div className="bg-white dark:bg-[#0e162d] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-colors duration-500 h-[320px] flex flex-col">
+             <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none transition-transform duration-700 group-hover:scale-125"></div>
+             
+             <div className="relative z-10 flex flex-col h-full">
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center border border-blue-100 dark:border-blue-500/20 shadow-sm shrink-0">
+                    <GraduationCap className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">The Arsenal</h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Core Intelligence Library</p>
+                  </div>
+                </div>
+
+                {/* Course List */}
+                <div className="flex-1 space-y-3 relative">
+                   <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-white/5 shadow-sm flex items-center justify-between group/course hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors cursor-pointer">
+                      <div className="flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 flex items-center justify-center shadow-sm">
+                           <Play className="w-3.5 h-3.5 text-blue-500 ml-0.5" />
+                         </div>
+                         <div>
+                            <p className="text-[12px] font-bold text-slate-900 dark:text-slate-200">The Mathematics of Wealth</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Lesson 1 &bull; 8 mins</p>
+                         </div>
+                      </div>
+                      <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                   </div>
+
+                   <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 border border-blue-100 dark:border-blue-500/20 shadow-sm flex items-center justify-between relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 dark:via-white/5 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite]"></div>
+                      <div className="flex items-center gap-3 relative z-10">
+                         <div className="w-8 h-8 rounded-full bg-blue-600 border border-blue-500 flex items-center justify-center shadow-sm shadow-blue-500/20">
+                           <Play className="w-3.5 h-3.5 text-white ml-0.5" />
+                         </div>
+                         <div>
+                            <p className="text-[12px] font-bold text-blue-900 dark:text-blue-100">Outsmarting Inflation</p>
+                            <div className="flex items-center gap-2 mt-1">
+                               <div className="h-1.5 w-16 bg-blue-200 dark:bg-blue-900/50 rounded-full overflow-hidden">
+                                  <div className="h-full bg-blue-500 w-[45%]"></div>
+                               </div>
+                               <p className="text-[9px] font-bold text-blue-600 dark:text-blue-400">45%</p>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+                   
+                   <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-white/5 shadow-sm flex items-center justify-between opacity-70">
+                      <div className="flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 flex items-center justify-center shadow-sm">
+                           <Lock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                         </div>
+                         <div>
+                            <p className="text-[12px] font-bold text-slate-700 dark:text-slate-400">Tax Optimization 101</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-500 mt-0.5">Unlocks after Lesson 2</p>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
           </div>
           <div className="text-left">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-bold text-xl mb-6">4</div>
