@@ -56,25 +56,49 @@ export default function ShieldView({ user, setActiveTab }: { user?: any, setActi
 
   const monthlyExpenses = metrics?.averageMonthlyExpense || 0;
   const currentBalance = metrics?.currentSavings || 0;
-  const targetEmergencyFund = monthlyExpenses > 0 ? monthlyExpenses * 6 : 0;
+  const targetEmergencyFund = metrics?.targetEmergencyFund || (monthlyExpenses > 0 ? monthlyExpenses * 6 : 0);
   const dailyBurnRate = monthlyExpenses > 0 ? monthlyExpenses / 30 : 0;
+  const isEstimatedExpense = metrics?.isEstimatedExpense;
   
-  let runwayDaysDisplay = "0 Days";
-  let runwayScoreValue = 0;
-
-  if (monthlyExpenses <= 0) {
-    if (currentBalance > 0) {
-      runwayDaysDisplay = "Infinite (Needs Expense Data)";
-      runwayScoreValue = 100;
-    } else {
-      runwayDaysDisplay = "0 Days";
-      runwayScoreValue = 0;
+  const formatRunway = (balance: number, burnRate: number, expenses: number): { display: string; score: number } => {
+    if (expenses <= 0) {
+      if (balance > 0) {
+        return { display: "Needs Expense Data", score: 50 };
+      }
+      return { display: "0 Days", score: 0 };
     }
-  } else {
-    const days = Math.floor(currentBalance / dailyBurnRate);
-    runwayDaysDisplay = `${days} Days`;
-    runwayScoreValue = Math.min(Math.round((days / 180) * 100), 100);
-  }
+
+    if (burnRate <= 0 || balance <= 0) {
+      return { display: "0 Days", score: 0 };
+    }
+
+    const days = Math.floor(balance / burnRate);
+    const score = Math.min(Math.round((days / 180) * 100), 100);
+
+    if (days < 30) {
+      return { display: `${days} Day${days === 1 ? '' : 's'}`, score };
+    }
+    if (days < 90) {
+      const months = (days / 30).toFixed(1);
+      return { display: `${days} Days (~${months} Mos)`, score };
+    }
+    if (days < 365) {
+      const months = (days / 30).toFixed(1);
+      return { display: `${months} Months (${days} Days)`, score };
+    }
+    if (days < 1825) {
+      const years = (days / 365).toFixed(1);
+      const months = Math.floor(days / 30);
+      return { display: `${years} Years (${months} Mos)`, score };
+    }
+    if (days < 3650) {
+      const years = (days / 365).toFixed(1);
+      return { display: `${years} Years (Financially Secure)`, score: 100 };
+    }
+    return { display: "10+ Years (Financial Independence)", score: 100 };
+  };
+
+  const { display: runwayDaysDisplay, score: runwayScoreValue } = formatRunway(currentBalance, dailyBurnRate, monthlyExpenses);
 
   // Calculate resilience score
   const resilienceScore = metrics?.protectionScore ?? runwayScoreValue;
@@ -174,6 +198,11 @@ export default function ShieldView({ user, setActiveTab }: { user?: any, setActi
                   <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
                     (6 Months) living expenses liquidity.
                   </p>
+                  {isEstimatedExpense && (
+                    <p className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                      *Target calibrated to 50% essential living baseline. Log recurring expenses in Omni-Tracker for personalized burn rate.
+                    </p>
+                  )}
                 </div>
                 
                 <div className="h-2.5 sm:h-3 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">

@@ -67,7 +67,18 @@ export default function BlackSwanSimulator({ currentBalance, dailyBurnRate, user
   let survivingRunway = "0 Days";
   if (newBalance > 0) {
     if (dailyBurnRate > 0) {
-      survivingRunway = `${Math.floor(newBalance / dailyBurnRate)} Days`;
+      const days = Math.floor(newBalance / dailyBurnRate);
+      if (days < 30) {
+        survivingRunway = `${days} Days`;
+      } else if (days < 90) {
+        survivingRunway = `${days} Days (~${(days / 30).toFixed(1)} Mos)`;
+      } else if (days < 365) {
+        survivingRunway = `${(days / 30).toFixed(1)} Months (${days} Days)`;
+      } else if (days < 1825) {
+        survivingRunway = `${(days / 365).toFixed(1)} Years`;
+      } else {
+        survivingRunway = "5+ Years";
+      }
     } else {
       survivingRunway = "Infinite";
     }

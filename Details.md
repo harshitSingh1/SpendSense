@@ -133,6 +133,136 @@ npm run start
 
 ---
 
-## 6. Summary
+## 6. Complete Demo Video Script (Full Website Walkthrough)
+
+Use this script to record a professional, high-converting product demo or video presentation of SpendSense AI.
+
+### Demo Specifications
+- **Recommended Video Length:** 3 to 4 minutes
+- **Tone:** Confident, articulate, calm, and professional
+- **Audio:** Clear voiceover with subtle, ambient background lofi or tech soundtrack
+- **Screen Setup:** 1920x1080 resolution, full browser view, clean cursor movements
+
+---
+
+### Scene 1: Introduction and The Hook (0:00 to 0:30)
+**On-Screen Action:**
+- Show the SpendSense landing page in light mode. Smoothly scroll down from the top banner to the Sonsie One typography logo and the hero heading: *"Stop Tracking Crumbs. Start Architecting Wealth."*
+- Move the cursor gently across the clean minimalist interface and toggle between Dark Mode and Light Mode once to showcase visual polish.
+
+**Voiceover Narration:**
+> "Most budgeting apps fail because they act as financial autopsies. They notify you after you have already overspent on a weekend dinner, categorizing expenses into colorful charts while offering zero forward-looking strategy.
+> 
+> Welcome to SpendSense AI: the intelligent, full-stack wealth operating system designed to give you institutional-grade capital allocation, aggressive insurance defense, and calm, disciplined financial growth."
+
+---
+
+### Scene 2: The Core Pillars on Landing Page (0:30 to 1:00)
+**On-Screen Action:**
+- Scroll to Section 3 of the landing page: the Four Operational Pillars.
+- Pause on each interactive visual card:
+  1. **Track:** The Omni-Tracker card showing the 60% Defensive and 40% Offensive split with live sync badge.
+  2. **Protect:** The Policy Auditor card highlighting the scanned clause and the Room Rent Capping warning.
+  3. **Grow:** The Stocrates AI chat card with allocation split.
+  4. **Learn:** The Arsenal course cards with completed lessons and progress bars.
+
+**Voiceover Narration:**
+> "SpendSense is built on four core pillars:
+> First: Active Capital Allocation, dividing your money into Defensive capital for survival and Offensive capital for wealth creation.
+> Second: The Policy Auditor, which scans your insurance documents to catch predatory fine-print traps.
+> Third: Stocrates, your private AI Chief Financial Officer.
+> And Fourth: The Arsenal, a curated repository of real-world lifestyle arbitrage playbooks."
+
+---
+
+### Scene 3: Entering the Executive Dashboard (1:00 to 1:35)
+**On-Screen Action:**
+- Click on the "Get Started" or "Open Dashboard" button.
+- The screen smoothly transitions to the main SpendSense Dashboard.
+- Hover over the top bar showing the personalized greeting, current date, and time-range filters ("Monthly", "Yearly", "All Time").
+- Click the time-range filters to show instant data updates.
+- Point out the Defensive vs. Offensive Capital breakdown, the cashflow velocity bar, and the net savings rate.
+
+**Voiceover Narration:**
+> "Stepping into the main cockpit, you immediately see your financial reality with total clarity. 
+> Notice how we do not lump all expenses together. Instead, SpendSense instantly isolates your Defensive Capital: rent, bills, groceries, and debt: from your Offensive Capital, the money actively deployed into investments.
+> With one click, you can toggle between monthly, yearly, and all-time horizons to monitor your capital velocity."
+
+---
+
+### Scene 4: The Omni-Tracker in Action (1:35 to 2:05)
+**On-Screen Action:**
+- Click on the "Omni-Tracker" tab in the navigation sidebar.
+- Show the transaction table with badges separating Defensive Needs, Offensive Investments, and Discretionary items.
+- Click the "Add Transaction" or filter buttons. Show how quickly an entry updates your real-time allocation percentage.
+
+**Voiceover Narration:**
+> "In the Omni-Tracker, every single rupee or dollar is accounted for with strategic purpose. 
+> When cash comes in, SpendSense categorizes it in real time, alerting you the moment your defensive buffer is secure so you can route excess cash into high-compounding offensive assets. It eliminates guesswork and ends financial anxiety."
+
+---
+
+### Scene 5: The Policy Auditor and Claim Enforcer (2:05 to 2:45)
+**On-Screen Action:**
+- Click on the "Protection" tab (Shield icon) in the sidebar.
+- Demonstrate the upload area or click "Load Sample Policy".
+- Watch the AI processing state transition into the audit breakdown.
+- Highlight the Red Risk Flag: *"Clause 3.4: 1% Room Rent Capping Detected"*.
+- Scroll to the "Claim Enforcer" section. Click "Draft Dispute Notice" to show the auto-generated legal dispute letter citing insurance regulations.
+
+**Voiceover Narration:**
+> "Now, let's look at one of SpendSense's most powerful features: The Policy Auditor.
+> Millions of families pay health insurance premiums for years, only to face devastating out-of-pocket bills during an emergency because of hidden sub-limits.
+> With SpendSense, simply upload your policy PDF. Our Gemini AI engine scans every clause, exposing room rent caps, co-pays, and hidden exclusions in plain English.
+> Even better: if an insurer wrongfully rejects or cuts your claim, the Claim Enforcer automatically drafts an aggressive legal notice citing insurance regulations to force a fair re-evaluation."
+
+---
+
+### Scene 6: Stocrates and Portfolio Architect (2:45 to 3:20)
+**On-Screen Action:**
+- Click on the "AI Coach" (Bot icon) or "Wealth Engine" in the sidebar.
+- Show Stocrates AI ready for dialogue.
+- Type or select a prompt: *"I have ₹20,000 extra this month. Where should I put it?"*
+- Hit send. Show the streaming response delivering a disciplined mathematical breakdown: index funds, emergency reserve, and tactical growth.
+- Switch to the Wealth Engine view to display the risk appetite slider and the dynamic ETF allocation pie chart.
+
+**Voiceover Narration:**
+> "For long-term compounding, meet Stocrates: our AI Chief Financial Officer. 
+> Unlike generic chatbots or commission-driven financial advisors, Stocrates gives you calm, math-first guidance grounded in modern portfolio theory.
+> Ask it how to allocate a surplus, simulate early retirement, or calculate whether to prepay a mortgage versus investing in index funds. 
+> Stocrates runs the numbers objectively, tailoring every response to your specific risk tolerance."
+
+---
+
+### Scene 7: The Tactical Arsenal and Piggy Banks (3:20 to 3:50)
+**On-Screen Action:**
+- Navigate to "The Arsenal" tab.
+- Filter by categories: "Food and Dining Hacks", "Flight and Travel Engineering", "Cab and Transport Arbitrage", and "Shopping and Cashback".
+- Click on an arbitrage card (such as "EatSure" or "Skiplagged") to reveal the step-by-step strategy breakdown.
+- Quickly show the "Piggy Banks" (Goals) tab, showing goal progress bars and target completion dates.
+- Press `Ctrl + K` (or `Cmd + K`) to open the Command Palette, quickly jumping between views.
+
+**Voiceover Narration:**
+> "SpendSense also gives you unfair real-world leverage through The Tactical Arsenal: step-by-step playbooks for flight ticket loopholes, dining savings, and travel arbitrage.
+> Combined with interactive Piggy Bank goal trackers and a universal Command Palette for lightning-fast keyboard navigation, you have an entire financial command center at your fingertips."
+
+---
+
+### Scene 8: Closing and Call to Action (3:50 to 4:15)
+**On-Screen Action:**
+- Return to the top of the application or the clean profile settings.
+- Show the notification drawer with the daily market brief.
+- Smoothly transition back to the Landing Page hero section.
+- Display the website URL on-screen with a clean closing card.
+
+**Voiceover Narration:**
+> "Personal wealth is not about deprivation or obsessive penny-pinching; it is about intentional architecture, airtight legal defense, and relentless compounding.
+> Take control of your financial future today.
+> Experience SpendSense AI: your money, fully defended and strategically deployed.
+> Start your journey at spendsense.ai."
+
+---
+
+## 7. Summary
 
 SpendSense AI bridges the gap between passive bookkeeping and institutional wealth defense. By pairing **The Omni-Tracker** for proactive capital allocation, **The Policy Auditor** for legal protection, and **Stocrates** for calm, mathematical guidance, SpendSense empowers users to protect what they have earned and grow what they own.

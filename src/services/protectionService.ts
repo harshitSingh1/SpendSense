@@ -11,6 +11,7 @@ export interface ProtectionMetrics {
   hasActiveInsurance: boolean;
   insurancePaymentsCount: number;
   protectionScore: number;
+  isEstimatedExpense?: boolean;
 }
 
 export async function getProtectionMetrics(): Promise<ProtectionMetrics> {
